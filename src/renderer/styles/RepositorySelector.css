@@ -1,0 +1,41 @@
+.repository-selector {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.selector-row {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  margin-bottom: 15px;
+}
+
+.selector-row:last-child {
+  margin-bottom: 0;
+}
+
+.input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.input-group label {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.selector-row button {
+  background: #2196f3;
+  color: white;
+  white-space: nowrap;
+}
+
+.selector-row button:hover:not(:disabled) {
+  background: #1976d2;
+}
