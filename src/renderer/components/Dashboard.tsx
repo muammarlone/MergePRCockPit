@@ -11,13 +11,19 @@ import { FileOperations } from './FileOperations';
 import '../styles/Dashboard.css';
 
 export const Dashboard: React.FC = () => {
-  const user = authService.getCurrentUser();
+  const [user, setUser] = useState(authService.getCurrentUser());
   const [selectedOwner, setSelectedOwner] = useState('');
   const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
   const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
   const [metrics, setMetrics] = useState<RepositoryMetrics | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'prs' | 'analytics' | 'enhanced' | 'remediation' | 'files'>('prs');
+
+  useEffect(() => {
+    // Update user state when auth changes
+    const currentUser = authService.getCurrentUser();
+    setUser(currentUser);
+  }, []);
 
   useEffect(() => {
     if (selectedRepo) {

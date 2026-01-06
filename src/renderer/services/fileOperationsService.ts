@@ -29,8 +29,8 @@ export interface SecurityCheck {
 
 class FileOperationsService {
   private octokit: Octokit | null = null;
-  private maxFileSize = 100 * 1024 * 1024; // 100MB limit
-  private allowedExtensions = ['.zip', '.docx', '.pptx', '.xlsx', '.pdf', '.doc', '.ppt', '.xls'];
+  private readonly MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB limit
+  private readonly ALLOWED_EXTENSIONS = ['.zip', '.docx', '.pptx', '.xlsx', '.pdf', '.doc', '.ppt', '.xls'];
 
   constructor() {
     this.initializeOctokit();
@@ -38,7 +38,10 @@ class FileOperationsService {
 
   private initializeOctokit(): void {
     const token = authService.getAccessToken();
-    if (token && token.startsWith('github-')) {
+    // GitHub tokens typically start with ghp_, gho_, ghu_, or ghs_
+    if (token && (token.startsWith('ghp_') || token.startsWith('gho_') || 
+                   token.startsWith('ghu_') || token.startsWith('ghs_') ||
+                   token.startsWith('github-'))) {
       this.octokit = new Octokit({ auth: token });
     } else {
       this.octokit = new Octokit();
@@ -238,7 +241,7 @@ class FileOperationsService {
   filterSupportedFiles(files: FileMetadata[]): FileMetadata[] {
     return files.filter(file => {
       const ext = this.getFileExtension(file.name);
-      return this.allowedExtensions.includes(ext);
+      return this.ALLOWED_EXTENSIONS.includes(ext);
     });
   }
 
@@ -250,13 +253,13 @@ class FileOperationsService {
     const warnings: string[] = [];
 
     // Check file size
-    if (operation.size > this.maxFileSize) {
-      issues.push(`File size (${this.formatSize(operation.size)}) exceeds maximum allowed (${this.formatSize(this.maxFileSize)})`);
+    if (operation.size > this.MAX_FILE_SIZE) {
+      issues.push(`File size (${this.formatSize(operation.size)}) exceeds maximum allowed (${this.formatSize(this.MAX_FILE_SIZE)})`);
     }
 
     // Check file extension
     const ext = this.getFileExtension(operation.fileName);
-    if (!this.allowedExtensions.includes(ext)) {
+    if (!this.ALLOWED_EXTENSIONS.includes(ext)) {
       issues.push(`File type ${ext} is not allowed`);
     }
 
