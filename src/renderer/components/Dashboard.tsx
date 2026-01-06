@@ -5,6 +5,8 @@ import { authService } from '../services/authService';
 import { RepositorySelector } from './RepositorySelector';
 import { PullRequestList } from './PullRequestList';
 import { Analytics } from './Analytics';
+import { RemediationDashboard } from './RemediationDashboard';
+import { FileOperations } from './FileOperations';
 import '../styles/Dashboard.css';
 
 export const Dashboard: React.FC = () => {
@@ -14,7 +16,7 @@ export const Dashboard: React.FC = () => {
   const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
   const [metrics, setMetrics] = useState<RepositoryMetrics | null>(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'prs' | 'analytics'>('prs');
+  const [activeTab, setActiveTab] = useState<'prs' | 'analytics' | 'remediation' | 'files'>('prs');
 
   useEffect(() => {
     if (selectedRepo) {
@@ -92,6 +94,18 @@ export const Dashboard: React.FC = () => {
               >
                 Analytics
               </button>
+              <button
+                className={activeTab === 'remediation' ? 'active' : ''}
+                onClick={() => setActiveTab('remediation')}
+              >
+                🔧 Remediation
+              </button>
+              <button
+                className={activeTab === 'files' ? 'active' : ''}
+                onClick={() => setActiveTab('files')}
+              >
+                📁 Files
+              </button>
             </div>
 
             <div className="tab-content">
@@ -105,6 +119,23 @@ export const Dashboard: React.FC = () => {
               )}
               {activeTab === 'analytics' && metrics && (
                 <Analytics metrics={metrics} repository={selectedRepo} />
+              )}
+              {activeTab === 'remediation' && (
+                <RemediationDashboard
+                  pullRequests={pullRequests}
+                  repository={{
+                    owner: selectedRepo.owner.login,
+                    name: selectedRepo.name
+                  }}
+                />
+              )}
+              {activeTab === 'files' && (
+                <FileOperations
+                  repository={{
+                    owner: selectedRepo.owner.login,
+                    name: selectedRepo.name
+                  }}
+                />
               )}
             </div>
           </>

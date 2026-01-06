@@ -26,6 +26,7 @@ Files Changed: ${pr.changed_files}
 Additions: ${pr.additions}
 Deletions: ${pr.deletions}
 Comments: ${pr.comments}
+Mergeable: ${pr.mergeable === false ? 'Has conflicts' : pr.mergeable === true ? 'Clean' : 'Unknown'}
 
 Please provide:
 1. A brief summary of the changes
@@ -33,8 +34,11 @@ Please provide:
 3. Suggested reviewers (if any patterns detected)
 4. Potential issues to watch for
 5. General suggestions for improvement
+6. Conflict probability (0-100)
+7. Likely conflict areas
+8. Remediation steps if conflicts exist
 
-Format your response as JSON with keys: summary, riskAssessment, suggestedReviewers (array), potentialIssues (array), suggestions (array)`;
+Format your response as JSON with keys: summary, riskAssessment, suggestedReviewers (array), potentialIssues (array), suggestions (array), conflictProbability (number), conflictAreas (array), remediationSteps (array)`;
   }
 
   private async generateCompletion(prompt: string): Promise<string> {
@@ -65,7 +69,10 @@ Format your response as JSON with keys: summary, riskAssessment, suggestedReview
           riskAssessment: parsed.riskAssessment || 'medium',
           suggestedReviewers: parsed.suggestedReviewers || [],
           potentialIssues: parsed.potentialIssues || [],
-          suggestions: parsed.suggestions || []
+          suggestions: parsed.suggestions || [],
+          conflictProbability: parsed.conflictProbability || 0,
+          conflictAreas: parsed.conflictAreas || [],
+          remediationSteps: parsed.remediationSteps || []
         };
       }
     } catch (error) {
@@ -77,7 +84,10 @@ Format your response as JSON with keys: summary, riskAssessment, suggestedReview
       riskAssessment: 'medium',
       suggestedReviewers: [],
       potentialIssues: [],
-      suggestions: []
+      suggestions: [],
+      conflictProbability: 0,
+      conflictAreas: [],
+      remediationSteps: []
     };
   }
 
@@ -87,7 +97,10 @@ Format your response as JSON with keys: summary, riskAssessment, suggestedReview
       riskAssessment: 'medium',
       suggestedReviewers: [],
       potentialIssues: ['AI analysis unavailable'],
-      suggestions: ['Install Ollama to enable AI-powered PR analysis']
+      suggestions: ['Install Ollama to enable AI-powered PR analysis'],
+      conflictProbability: 0,
+      conflictAreas: [],
+      remediationSteps: []
     };
   }
 
