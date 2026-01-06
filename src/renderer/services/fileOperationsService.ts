@@ -2,6 +2,14 @@ import { FileOperation, FileOperationResult } from '../types';
 import { Octokit } from '@octokit/rest';
 import { authService } from './authService';
 
+// File signature magic numbers for validation
+const FILE_SIGNATURES = {
+  zip: [[0x50, 0x4B, 0x03, 0x04], [0x50, 0x4B, 0x05, 0x06]],
+  docx: [[0x50, 0x4B, 0x03, 0x04]], // docx is a zip file
+  pptx: [[0x50, 0x4B, 0x03, 0x04]], // pptx is a zip file
+  xlsx: [[0x50, 0x4B, 0x03, 0x04]]  // xlsx is a zip file
+};
+
 class FileOperationsService {
   private octokit: Octokit | null = null;
 
@@ -262,14 +270,7 @@ class FileOperationsService {
    */
   private validateFileSignature(buffer: Buffer, fileType: string): boolean {
     // Check magic numbers for common file types
-    const signatures: { [key: string]: number[][] } = {
-      zip: [[0x50, 0x4B, 0x03, 0x04], [0x50, 0x4B, 0x05, 0x06]],
-      docx: [[0x50, 0x4B, 0x03, 0x04]], // docx is a zip file
-      pptx: [[0x50, 0x4B, 0x03, 0x04]], // pptx is a zip file
-      xlsx: [[0x50, 0x4B, 0x03, 0x04]]  // xlsx is a zip file
-    };
-
-    const typeSignatures = signatures[fileType];
+    const typeSignatures = FILE_SIGNATURES[fileType as keyof typeof FILE_SIGNATURES];
     if (!typeSignatures) {
       return true; // Unknown type, skip validation
     }
@@ -281,10 +282,12 @@ class FileOperationsService {
 
   /**
    * Calculate checksum for file integrity
+   * NOTE: This is a simple implementation for demonstration.
+   * For production use, implement proper cryptographic hashing using crypto.createHash('sha256')
    */
   private calculateChecksum(content: string | Buffer): string {
     // Simple checksum implementation
-    // In production, use crypto.createHash('sha256')
+    // TODO: Replace with crypto.createHash('sha256') for production
     const buffer = Buffer.isBuffer(content) ? content : Buffer.from(content);
     let sum = 0;
     for (let i = 0; i < buffer.length; i++) {

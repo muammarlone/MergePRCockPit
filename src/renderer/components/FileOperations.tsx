@@ -59,8 +59,8 @@ export const FileOperations: React.FC<FileOperationsProps> = ({ repository }) =>
     try {
       const reader = new FileReader();
       reader.onload = async (e) => {
-        const content = e.target?.result;
-        if (!content) {
+        const arrayBuffer = e.target?.result;
+        if (!arrayBuffer) {
           setResult({
             success: false,
             message: 'Failed to read file',
@@ -71,12 +71,13 @@ export const FileOperations: React.FC<FileOperationsProps> = ({ repository }) =>
         }
 
         const fileType = getFileType(uploadFile.name);
+        const buffer = Buffer.from(arrayBuffer as ArrayBuffer);
         const uploadResult = await fileOperationsService.uploadFile(
           repository.owner,
           repository.name,
           uploadBranch,
           uploadPath,
-          content as string,
+          buffer,
           uploadMessage,
           fileType
         );

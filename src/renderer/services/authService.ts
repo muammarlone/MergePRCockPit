@@ -47,25 +47,25 @@ class AuthService {
 
   async loginWithGoogle(): Promise<User> {
     // In a real implementation, this would open OAuth flow
-    // For now, we'll simulate it
+    // For now, we'll simulate it with a direct promise resolution
+    const mockUser: User = {
+      id: 'google-' + Date.now(),
+      email: 'user@gmail.com',
+      name: 'Google User',
+      provider: 'google'
+    };
+    
+    const mockToken: AuthToken = {
+      accessToken: 'mock-google-token-' + Date.now(),
+      expiresAt: Date.now() + 3600000
+    };
+    
+    this.user = mockUser;
+    this.token = mockToken;
+    this.saveToStorage();
+    
+    // Simulate async auth flow
     return new Promise((resolve) => {
-      // This would trigger OAuth window
-      const mockUser: User = {
-        id: 'google-' + Date.now(),
-        email: 'user@gmail.com',
-        name: 'Google User',
-        provider: 'google'
-      };
-      
-      const mockToken: AuthToken = {
-        accessToken: 'mock-google-token-' + Date.now(),
-        expiresAt: Date.now() + 3600000
-      };
-      
-      this.user = mockUser;
-      this.token = mockToken;
-      this.saveToStorage();
-      
       setTimeout(() => resolve(mockUser), 1000);
     });
   }
