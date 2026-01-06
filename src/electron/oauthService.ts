@@ -171,7 +171,7 @@ export class OAuthService {
       clientId,
       clientSecret,
       authorizationUrl: 'https://github.com/login/oauth/authorize',
-      tokenUrl: 'https://github.login/oauth/access_token',
+      tokenUrl: 'https://github.com/login/oauth/access_token',
       redirectUri: 'http://localhost:3000/oauth/callback',
       scope: ['user:email', 'read:user'],
     };
