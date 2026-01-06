@@ -329,7 +329,7 @@ monitoring:
     enabled: true
   grafana:
     enabled: true
-    adminPassword: <secure-password>
+    adminPassword: ${GRAFANA_ADMIN_PASSWORD}  # Set via environment variable or secret
 
 # Autoscaling
 autoscaling:

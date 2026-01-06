@@ -594,6 +594,9 @@ export default class SlackNotificationPlugin extends Plugin {
   async onEnable(ctx: PluginContext) {
     // Get Slack token from plugin config
     const token = await ctx.config.get('slack_token');
+    if (!token) {
+      throw new Error('Slack token not configured');
+    }
     this.slack = new WebClient(token);
     
     // Register hooks
@@ -668,8 +671,10 @@ export default class CodeQualityPlugin extends Plugin {
     // Run custom quality checks
     const issues = [];
     
-    // Check for console.log statements
-    if (diff.includes('console.log')) {
+    // Check for console.log statements (simple pattern matching - consider AST parsing for production)
+    // Note: This is a simplified example. For production, use AST parsing for accurate detection.
+    const consoleLogPattern = /^\+.*console\.log\(/gm;
+    if (consoleLogPattern.test(diff)) {
       issues.push({
         type: 'warning',
         message: 'Found console.log statement. Remove before merging.',
