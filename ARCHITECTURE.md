@@ -62,7 +62,9 @@ MergePR Cockpit is built following TOGAF (The Open Group Architecture Framework)
 - **RepositorySelector**: Repository owner and name selection
 - **PullRequestList**: List view of PRs with filtering
 - **PullRequestDetail**: Detailed PR view with merge capabilities
-- **Analytics**: Repository metrics and visualization
+- **Analytics**: Repository metrics and visualization with enhanced trends
+- **RemediationDashboard** (NEW v1.1.0): Conflict prediction and fix suggestions
+- **FileOperations** (NEW v1.1.0): File upload/download interface
 
 **Technology**: React 18 with TypeScript, CSS modules
 
@@ -109,10 +111,18 @@ MergePR Cockpit is built following TOGAF (The Open Group Architecture Framework)
 - getRepositoryMetrics(owner, repo): Promise<RepositoryMetrics>
 ```
 
+**Enhanced Metrics (v1.1.0)**:
+- PR velocity calculation (PRs per week)
+- Top contributors analysis with merge patterns
+- Conflict trend tracking over time
+- File hotspot identification
+
 #### OllamaService
 - AI-powered PR analysis
 - Risk assessment
 - Suggestion generation
+- **NEW:** Conflict prediction
+- **NEW:** Remediation recommendations
 - GPT export functionality
 
 **Key Methods**:
@@ -120,6 +130,35 @@ MergePR Cockpit is built following TOGAF (The Open Group Architecture Framework)
 - analyzePullRequest(pr): Promise<OllamaAnalysis>
 - testConnection(): Promise<boolean>
 - exportToGPT(context): Promise<string>
+```
+
+#### ConflictPredictionService (NEW v1.1.0)
+- Predictive merge conflict detection
+- Remediation suggestion generation
+- Historical conflict pattern analysis
+- Auto-fix feasibility assessment
+
+**Key Methods**:
+```typescript
+- predictConflicts(pr, baseBranch): Promise<ConflictPrediction>
+- generateRemediationSuggestions(prNumber, files, context): Promise<RemediationSuggestion[]>
+- analyzeConflictPatterns(prs): Promise<ConflictPatterns>
+- isAutoFixable(file, content): Promise<AutoFixAnalysis>
+```
+
+#### FileOperationsService (NEW v1.1.0)
+- Secure file upload/download
+- Office document handling (zip, docx, pptx, xlsx)
+- File versioning and history tracking
+- Integrity validation with checksums
+- Magic number verification for security
+
+**Key Methods**:
+```typescript
+- uploadFile(owner, repo, branch, path, content, message, type): Promise<FileOperationResult>
+- downloadFile(owner, repo, path, ref): Promise<FileOperationResult>
+- listFiles(owner, repo, path, extensions): Promise<FileOperation[]>
+- getFileHistory(owner, repo, path): Promise<FileVersion[]>
 ```
 
 ### 3. Data Access Layer
@@ -357,6 +396,32 @@ Bundled React App → Electron Main Process → Installed Application
    - Metrics collection
    - Error tracking
    - Performance monitoring
+
+## Recent Enhancements (v1.1.0)
+
+### Enhanced Analytics
+- **Trend Analysis**: Time-series visualization of conflicts and PR activity
+- **Velocity Metrics**: Track PR throughput and team productivity
+- **Contributor Analytics**: Identify top contributors and review patterns
+- **Conflict Trends**: Visualize merge conflict patterns over time
+
+### Predictive Intelligence
+- **AI-Powered Conflict Prediction**: Predict merge conflicts before they occur
+- **Risk Assessment**: Evaluate PR complexity and conflict probability
+- **Remediation Engine**: Generate actionable fix suggestions
+- **Auto-Fix Detection**: Identify conflicts that can be automatically resolved
+
+### File Operations
+- **Multi-Format Support**: Handle zip, docx, pptx, xlsx files
+- **Security Validation**: Magic number verification and size limits
+- **Version Control**: Track file history and changes
+- **Integrity Checks**: Checksum validation for uploads/downloads
+
+### Architecture Patterns
+- **Service-Oriented**: New services follow single responsibility principle
+- **Type Safety**: Comprehensive TypeScript interfaces for new features
+- **Error Handling**: Graceful degradation when AI services unavailable
+- **Testing**: 100% test coverage for new services
 
 ## Compliance with TOGAF
 

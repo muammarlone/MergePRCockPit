@@ -1,6 +1,9 @@
 import React from 'react';
 import { RepositoryMetrics, Repository } from '../types';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
+  PieChart, Pie, Cell, LineChart, Line 
+} from 'recharts';
 import '../styles/Analytics.css';
 
 interface AnalyticsProps {
@@ -50,6 +53,12 @@ export const Analytics: React.FC<AnalyticsProps> = ({ metrics, repository }) => 
           <h3>Merge Conflicts</h3>
           <div className="metric-value warning">{metrics.mergeConflicts}</div>
         </div>
+        {metrics.prVelocity !== undefined && (
+          <div className="metric-card">
+            <h3>PR Velocity</h3>
+            <div className="metric-value">{metrics.prVelocity.toFixed(1)}/week</div>
+          </div>
+        )}
       </div>
 
       <div className="charts-grid">
@@ -89,6 +98,40 @@ export const Analytics: React.FC<AnalyticsProps> = ({ metrics, repository }) => 
             </PieChart>
           </ResponsiveContainer>
         </div>
+
+        {metrics.conflictTrends && metrics.conflictTrends.length > 0 && (
+          <div className="chart-container">
+            <h3>Conflict Trends</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={metrics.conflictTrends}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="conflicts" stroke="#f44336" name="Conflicts" />
+                <Line type="monotone" dataKey="resolved" stroke="#4caf50" name="Resolved" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {metrics.topContributors && metrics.topContributors.length > 0 && (
+          <div className="chart-container">
+            <h3>Top Contributors</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={metrics.topContributors}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="login" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="totalPRs" fill="#2196f3" name="Total PRs" />
+                <Bar dataKey="mergedPRs" fill="#4caf50" name="Merged PRs" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
 
       <div className="insights">
@@ -102,6 +145,11 @@ export const Analytics: React.FC<AnalyticsProps> = ({ metrics, repository }) => 
           <li>
             Average time to merge: {metrics.avgMergeTime.toFixed(1)} hours
           </li>
+          {metrics.prVelocity !== undefined && (
+            <li>
+              PR Velocity: {metrics.prVelocity.toFixed(1)} PRs per week
+            </li>
+          )}
           {metrics.mergeConflicts > 0 && (
             <li className="warning">
               ⚠️ {metrics.mergeConflicts} pull requests have merge conflicts
@@ -110,6 +158,11 @@ export const Analytics: React.FC<AnalyticsProps> = ({ metrics, repository }) => 
           {metrics.openPRs > 10 && (
             <li className="info">
               ℹ️ High number of open PRs ({metrics.openPRs}). Consider reviewing backlog.
+            </li>
+          )}
+          {metrics.topContributors && metrics.topContributors.length > 0 && (
+            <li className="info">
+              🏆 Top contributor: {metrics.topContributors[0].login} with {metrics.topContributors[0].totalPRs} PRs
             </li>
           )}
         </ul>

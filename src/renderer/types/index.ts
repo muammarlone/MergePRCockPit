@@ -62,6 +62,34 @@ export interface RepositoryMetrics {
   closedPRs: number;
   avgMergeTime: number;
   mergeConflicts: number;
+  // Enhanced metrics
+  prVelocity?: number; // PRs per week
+  avgTimeToFirstReview?: number; // hours
+  topContributors?: ContributorStats[];
+  fileHotspots?: FileHotspot[];
+  conflictTrends?: ConflictTrend[];
+}
+
+export interface ContributorStats {
+  login: string;
+  avatar_url: string;
+  totalPRs: number;
+  mergedPRs: number;
+  reviewCount: number;
+  avgMergeTime: number;
+}
+
+export interface FileHotspot {
+  filename: string;
+  changeCount: number;
+  lastModified: string;
+  contributors: string[];
+}
+
+export interface ConflictTrend {
+  date: string;
+  conflicts: number;
+  resolved: number;
 }
 
 export interface OllamaAnalysis {
@@ -71,6 +99,50 @@ export interface OllamaAnalysis {
   suggestedReviewers: string[];
   potentialIssues: string[];
   suggestions: string[];
+  // Enhanced for conflict prediction
+  conflictProbability?: number;
+  conflictAreas?: string[];
+  remediationSteps?: string[];
+}
+
+export interface ConflictPrediction {
+  prNumber: number;
+  probability: number; // 0-100
+  riskLevel: 'low' | 'medium' | 'high';
+  conflictingFiles: string[];
+  suggestedActions: string[];
+  autoFixable: boolean;
+}
+
+export interface RemediationSuggestion {
+  id: string;
+  prNumber: number;
+  type: 'suggest' | 'fix' | 'auto-resolve';
+  description: string;
+  conflictFile: string;
+  suggestedResolution: string;
+  confidence: number;
+  applied: boolean;
+}
+
+export interface FileOperation {
+  id: string;
+  filename: string;
+  fileType: 'zip' | 'docx' | 'pptx' | 'xlsx' | 'other';
+  size: number;
+  checksum: string;
+  uploadedAt: string;
+  uploadedBy: string;
+  version: number;
+  repository: string;
+  branch: string;
+}
+
+export interface FileOperationResult {
+  success: boolean;
+  message: string;
+  fileOperation?: FileOperation;
+  error?: string;
 }
 
 // Electron API types
