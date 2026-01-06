@@ -1,3 +1,4 @@
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import { EvidenceCollector } from '../../framework/evidence-collector';
 
@@ -15,7 +16,6 @@ describe('UAT-AUTH-001: Google OAuth Flow', () => {
     const authServicePath = path.join(process.cwd(), 'src', 'renderer', 'services', 'authService.ts');
     
     // Verify the file exists
-    const fs = require('fs-extra');
     const exists = await fs.pathExists(authServicePath);
     expect(exists).toBe(true);
 
@@ -24,9 +24,9 @@ describe('UAT-AUTH-001: Google OAuth Flow', () => {
       exists,
     });
 
-    // Read file content and check for Google OAuth
+    // Read file content and check for Google OAuth (case-insensitive)
     const content = await fs.readFile(authServicePath, 'utf-8');
-    const hasGoogleAuth = content.includes('Google') || content.includes('google');
+    const hasGoogleAuth = /google/i.test(content);
     expect(hasGoogleAuth).toBe(true);
 
     await evidence.recordMetadata(testId, {
@@ -38,20 +38,19 @@ describe('UAT-AUTH-001: Google OAuth Flow', () => {
 
   test('OAuth flow can be initiated or mocked', async () => {
     // Since we can't test actual OAuth in UAT, we verify the implementation exists
-    const fs = require('fs-extra');
     const authServicePath = path.join(process.cwd(), 'src', 'renderer', 'services', 'authService.ts');
     const content = await fs.readFile(authServicePath, 'utf-8');
 
     // Check for mock or actual implementation
     const hasOAuthImplementation = 
-      content.includes('loginWithGoogle') || 
-      content.includes('mockGoogleLogin');
+      /loginWithGoogle/i.test(content) || 
+      /mockGoogleLogin/i.test(content);
     
     expect(hasOAuthImplementation).toBe(true);
 
     await evidence.recordMetadata(testId, {
       hasOAuthImplementation,
-      implementationType: content.includes('mock') ? 'mock' : 'actual',
+      implementationType: /mock/i.test(content) ? 'mock' : 'actual',
     });
 
     await evidence.captureLogs(testId);

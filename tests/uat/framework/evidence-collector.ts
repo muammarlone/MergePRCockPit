@@ -30,14 +30,21 @@ export class EvidenceCollector {
 
   /**
    * Capture a screenshot (simulated in non-GUI environment)
+   * 
+   * NOTE: This implementation creates placeholder files in non-GUI environments.
+   * In a full Electron or browser environment, this should be replaced with
+   * actual screenshot capture using Playwright or Puppeteer's screenshot() API.
+   * 
+   * Example for Playwright:
+   *   await page.screenshot({ path: filePath });
    */
   async captureScreenshot(testId: string, description: string): Promise<string> {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const filename = `${testId}-${description}-${timestamp}.png`;
     const filePath = path.join(this.evidenceDir, filename);
 
-    // In a real implementation, this would capture actual screenshots
-    // For now, we create a placeholder
+    // In a real implementation with GUI, this would capture actual screenshots
+    // For now, we create a placeholder to demonstrate the framework
     await fs.writeFile(filePath, `Screenshot placeholder for ${description}`);
 
     this.evidenceItems.push({
