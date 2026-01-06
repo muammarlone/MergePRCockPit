@@ -19,3 +19,13 @@ coverage/
 build/
 tmp/
 temp/
+
+# UAT Test Evidence and Reports (except templates and READMEs)
+tests/uat/evidence/*
+!tests/uat/evidence/.gitkeep
+!tests/uat/evidence/README.md
+tests/uat/reports/*
+!tests/uat/reports/.gitkeep
+!tests/uat/reports/templates/
+tests/uat/reports/templates/*
+!tests/uat/reports/templates/*.md
