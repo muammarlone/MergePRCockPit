@@ -1,0 +1,1 @@
+Place the Merge Cockpit app source files here before running install.sh

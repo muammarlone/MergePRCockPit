@@ -1,0 +1,272 @@
+.onboarding-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.onboarding-modal {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
+  margin: 20px;
+  padding: 50px 40px;
+  position: relative;
+}
+
+.onboarding-step {
+  text-align: center;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.onboarding-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.onboarding-step h2 {
+  margin: 0 0 12px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+}
+
+.onboarding-step p {
+  margin: 0 0 30px;
+  font-size: 16px;
+  color: #666;
+}
+
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 30px 0;
+  text-align: left;
+}
+
+.feature {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.feature:hover {
+  background: #f0f0f0;
+  transform: translateX(4px);
+}
+
+.feature-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.feature h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.feature p {
+  margin: 0;
+  font-size: 13px;
+  color: #999;
+}
+
+.steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 30px 0;
+  text-align: left;
+}
+
+.step-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.step-content h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.step-content p {
+  margin: 0;
+  font-size: 13px;
+  color: #999;
+}
+
+.tips-box {
+  background: #f0f3ff;
+  border: 1px solid #e0e6ff;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: left;
+  margin: 30px 0;
+}
+
+.tips-box h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.tips-box ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style: none;
+}
+
+.tips-box li {
+  margin: 8px 0;
+  font-size: 13px;
+  color: #666;
+  position: relative;
+  padding-left: 16px;
+}
+
+.tips-box li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #667eea;
+  font-weight: bold;
+}
+
+.onboarding-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.btn-primary {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  padding: 12px 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  color: #667eea;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  border-color: #667eea;
+  background: #f9f9f9;
+}
+
+.btn-secondary:active {
+  background: #f0f0f0;
+}
+
+.onboarding-progress {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 30px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ddd;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background: #667eea;
+  width: 24px;
+  border-radius: 4px;
+}
+
+@media (max-width: 600px) {
+  .onboarding-modal {
+    padding: 40px 20px;
+  }
+
+  .onboarding-step h2 {
+    font-size: 24px;
+  }
+
+  .feature,
+  .step-item {
+    gap: 12px;
+  }
+}
