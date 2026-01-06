@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { EvidenceCollector } from '../../framework/evidence-collector';
 
-describe('UAT-AUTH-001: Google OAuth Flow', () => {
+describe('UAT-AUTH-001: Google OAuth Configuration Validation', () => {
   const testId = 'UAT-AUTH-001';
   let evidence: EvidenceCollector;
 
@@ -11,7 +11,7 @@ describe('UAT-AUTH-001: Google OAuth Flow', () => {
     await evidence.initialize();
   });
 
-  test('Google OAuth service method exists', async () => {
+  test('Google OAuth service configuration exists', async () => {
     // Import the auth service
     const authServicePath = path.join(process.cwd(), 'src', 'renderer', 'services', 'authService.ts');
     
@@ -36,8 +36,9 @@ describe('UAT-AUTH-001: Google OAuth Flow', () => {
     await evidence.captureScreenshot(testId, 'google-oauth-implementation');
   });
 
-  test('OAuth flow can be initiated or mocked', async () => {
-    // Since we can't test actual OAuth in UAT, we verify the implementation exists
+  test('OAuth wiring/redirect validation (non-interactive)', async () => {
+    // NOTE: This test validates OAuth configuration and wiring, not end-to-end flow
+    // Actual OAuth flow requires user interaction and is not tested in UAT
     const authServicePath = path.join(process.cwd(), 'src', 'renderer', 'services', 'authService.ts');
     const content = await fs.readFile(authServicePath, 'utf-8');
 
@@ -51,6 +52,7 @@ describe('UAT-AUTH-001: Google OAuth Flow', () => {
     await evidence.recordMetadata(testId, {
       hasOAuthImplementation,
       implementationType: /mock/i.test(content) ? 'mock' : 'actual',
+      note: 'Configuration validation only - not end-to-end OAuth flow',
     });
 
     await evidence.captureLogs(testId);

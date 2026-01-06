@@ -27,7 +27,8 @@
     "uat:app": "npm run uat -- --testPathPattern=application",
     "uat:report": "node tests/uat/framework/generate-report.js",
     "uat:evidence": "node tests/uat/framework/package-evidence.js",
-    "uat:full": "npm run uat; npm run uat:report"
+    "uat:manifest": "node tests/uat/framework/generate-manifest.js",
+    "uat:full": "npm run uat; npm run uat:report; npm run uat:manifest"
   },
   "dependencies": {
     "@octokit/rest": "^20.0.2",

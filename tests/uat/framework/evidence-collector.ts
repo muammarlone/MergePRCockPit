@@ -13,6 +13,76 @@ export interface EvidenceItem {
   data?: any;
 }
 
+/**
+ * Patterns to redact sensitive information from evidence
+ * IMPORTANT: More specific patterns should come before general ones
+ */
+const REDACTION_PATTERNS = [
+  // JWT tokens (must come before Bearer tokens and general tokens)
+  { pattern: /eyJ[A-Za-z0-9_\-]*\.eyJ[A-Za-z0-9_\-]*\.[A-Za-z0-9_\-]*/g, replacement: '[REDACTED_JWT]' },
+  // Bearer tokens (must come before Authorization headers)
+  { pattern: /Bearer\s+[A-Za-z0-9_\-\.]+/gi, replacement: 'Bearer [REDACTED]' },
+  // Authorization headers (general fallback)
+  { pattern: /(Authorization:\s*)(.+)/gi, replacement: '$1[REDACTED]' },
+  // Cookie values (session cookies, auth cookies) - replace the entire cookie value
+  { pattern: /(Set-Cookie|Cookie):\s*([^;\n]+)(.*)/gi, replacement: '$1: [REDACTED]' },
+  // API Keys and Tokens - replace the entire value
+  { pattern: /((?:api[_-]?key|apikey|access[_-]?token|auth[_-]?token)[\s:=]+["']?)([A-Za-z0-9_\-\.]{20,})(["']?)/gi, replacement: '$1[REDACTED]$3' },
+  // General token pattern (must come after more specific token patterns)
+  { pattern: /((?:token)[\s:=]+["']?)([A-Za-z0-9_\-\.]{20,})(["']?)/gi, replacement: '$1[REDACTED]$3' },
+  // Passwords - replace the value
+  { pattern: /((?:password|passwd|pwd)[\s:=]+["']?)([^\s"']{6,})(["']?)/gi, replacement: '$1[REDACTED]$3' },
+  // Secrets - replace the value
+  { pattern: /((?:secret|client_secret)[\s:=]+["']?)([A-Za-z0-9_\-\.]{20,})(["']?)/gi, replacement: '$1[REDACTED]$3' },
+  // OAuth tokens - replace the value
+  { pattern: /((?:oauth|refresh_token|id_token)[\s:=]+["']?)([A-Za-z0-9_\-\.]{20,})(["']?)/gi, replacement: '$1[REDACTED]$3' },
+];
+
+/**
+ * Sanitize sensitive data from text
+ */
+export function sanitizeText(text: string): string {
+  let sanitized = text;
+  for (const { pattern, replacement } of REDACTION_PATTERNS) {
+    sanitized = sanitized.replace(pattern, replacement);
+  }
+  return sanitized;
+}
+
+/**
+ * Sanitize sensitive data from objects
+ */
+export function sanitizeObject(obj: any): any {
+  if (typeof obj === 'string') {
+    return sanitizeText(obj);
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => sanitizeObject(item));
+  }
+  
+  if (obj && typeof obj === 'object') {
+    const sanitized: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      // Redact common sensitive keys
+      const lowerKey = key.toLowerCase();
+      if (lowerKey.includes('password') || 
+          lowerKey.includes('secret') || 
+          lowerKey.includes('token') || 
+          lowerKey.includes('key') ||
+          lowerKey.includes('authorization') ||
+          lowerKey.includes('cookie')) {
+        sanitized[key] = '[REDACTED]';
+      } else {
+        sanitized[key] = sanitizeObject(value);
+      }
+    }
+    return sanitized;
+  }
+  
+  return obj;
+}
+
 export class EvidenceCollector {
   private testId: string;
   private evidenceDir: string;
@@ -58,21 +128,22 @@ export class EvidenceCollector {
   }
 
   /**
-   * Capture console logs
+   * Capture console logs with sanitization
    */
-  async captureLogs(testId: string): Promise<string> {
+  async captureLogs(testId: string, rawLogs?: string): Promise<string> {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const filename = `${testId}-logs-${timestamp}.txt`;
     const filePath = path.join(this.evidenceDir, filename);
 
-    // Capture console logs (simplified implementation)
-    const logs = `Test ID: ${testId}\nTimestamp: ${new Date().toISOString()}\n`;
-    await fs.writeFile(filePath, logs);
+    // Capture and sanitize console logs
+    const logs = rawLogs || `Test ID: ${testId}\nTimestamp: ${new Date().toISOString()}\n`;
+    const sanitizedLogs = sanitizeText(logs);
+    await fs.writeFile(filePath, sanitizedLogs);
 
     this.evidenceItems.push({
       type: 'log',
       timestamp: new Date().toISOString(),
-      description: 'Console logs',
+      description: 'Console logs (sanitized)',
       filePath: filename,
     });
 
@@ -80,25 +151,27 @@ export class EvidenceCollector {
   }
 
   /**
-   * Capture network activity
+   * Capture network activity with header/cookie sanitization
    */
-  async captureNetworkActivity(testId: string): Promise<string> {
+  async captureNetworkActivity(testId: string, networkData?: any): Promise<string> {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const filename = `${testId}-network-${timestamp}.json`;
     const filePath = path.join(this.evidenceDir, filename);
 
-    const networkData = {
+    const data = networkData || {
       testId,
       timestamp: new Date().toISOString(),
       requests: [],
     };
-
-    await fs.writeFile(filePath, JSON.stringify(networkData, null, 2));
+    
+    // Sanitize network data to remove sensitive headers/cookies
+    const sanitizedData = sanitizeObject(data);
+    await fs.writeFile(filePath, JSON.stringify(sanitizedData, null, 2));
 
     this.evidenceItems.push({
       type: 'network',
       timestamp: new Date().toISOString(),
-      description: 'Network activity',
+      description: 'Network activity (sanitized)',
       filePath: filename,
     });
 
@@ -144,21 +217,23 @@ export class EvidenceCollector {
   }
 
   /**
-   * Record test metadata
+   * Record test metadata with sanitization
    */
   async recordMetadata(testId: string, metadata: TestMetadata): Promise<void> {
-    this.metadata = { ...this.metadata, ...metadata };
+    // Sanitize metadata before storing
+    const sanitizedMetadata = sanitizeObject(metadata);
+    this.metadata = { ...this.metadata, ...sanitizedMetadata };
 
     this.evidenceItems.push({
       type: 'metadata',
       timestamp: new Date().toISOString(),
-      description: 'Test metadata',
-      data: metadata,
+      description: 'Test metadata (sanitized)',
+      data: sanitizedMetadata,
     });
   }
 
   /**
-   * Generate evidence report for this test
+   * Generate evidence report for this test with all data sanitized
    */
   async generateReport(testId: string): Promise<string> {
     const reportPath = path.join(this.evidenceDir, 'evidence-report.json');
@@ -168,6 +243,8 @@ export class EvidenceCollector {
       timestamp: new Date().toISOString(),
       metadata: this.metadata,
       evidence: this.evidenceItems,
+      sanitizationApplied: true,
+      note: 'All sensitive data has been redacted from this report',
     };
 
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
