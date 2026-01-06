@@ -231,25 +231,110 @@ npm run build:linux
 
 ## Configuration
 
-### Environment Variables
+### OAuth Setup (Required for Authentication)
 
-Create a `.env` file in the application directory (optional):
+MergePR Cockpit supports OAuth 2.0 authentication with Google and GitHub. Follow these steps to configure OAuth providers:
 
-```env
-# Ollama Configuration
-OLLAMA_HOST=http://localhost:11434
-OLLAMA_MODEL=llama2
+#### Google OAuth Setup
 
-# GitHub Configuration (for future OAuth)
-GITHUB_CLIENT_ID=your_client_id
-GITHUB_CLIENT_SECRET=your_client_secret
+1. **Create OAuth Credentials**
+   - Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+   - Create a new project or select an existing one
+   - Navigate to "Credentials" → "Create Credentials" → "OAuth 2.0 Client ID"
+   
+2. **Configure OAuth Consent Screen**
+   - Go to "OAuth consent screen"
+   - Select "External" user type
+   - Fill in application name: "MergePR Cockpit"
+   - Add scopes: `openid`, `profile`, `email`
+   - Save and continue
 
-# Google OAuth (for future)
-GOOGLE_CLIENT_ID=your_client_id
-GOOGLE_CLIENT_SECRET=your_client_secret
+3. **Create OAuth Client ID**
+   - Application type: "Desktop app"
+   - Name: "MergePR Cockpit"
+   - Click "Create"
+   
+4. **Configure Redirect URI**
+   - Add authorized redirect URI: `http://localhost:3000/oauth/callback`
+   - Save changes
+
+5. **Copy Credentials**
+   - Copy the Client ID and Client Secret
+   - Keep these secure - never commit them to source control
+
+#### GitHub OAuth Setup
+
+1. **Register OAuth App**
+   - Go to [GitHub Developer Settings](https://github.com/settings/developers)
+   - Click "New OAuth App"
+   - Fill in the form:
+     - Application name: "MergePR Cockpit"
+     - Homepage URL: `http://localhost:3000`
+     - Authorization callback URL: `http://localhost:3000/oauth/callback`
+   - Click "Register application"
+
+2. **Generate Client Secret**
+   - Click "Generate a new client secret"
+   - Copy the client secret immediately (it won't be shown again)
+
+3. **Copy Credentials**
+   - Copy the Client ID
+   - Keep both Client ID and Client Secret secure
+
+#### Configure Environment Variables
+
+Create a `.env` file in the application root directory:
+
+```bash
+# Copy the example environment file
+cp .env.example .env
 ```
 
+Edit `.env` and add your OAuth credentials:
+
+```env
+# Google OAuth 2.0 Credentials
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+
+# GitHub OAuth App Credentials
+GITHUB_CLIENT_ID=your_github_client_id_here
+GITHUB_CLIENT_SECRET=your_github_client_secret_here
+
+# Ollama Configuration (Optional)
+OLLAMA_HOST=http://localhost:11434
+OLLAMA_MODEL=llama2
+```
+
+**Important Security Notes:**
+- Never commit `.env` file to version control (it's in `.gitignore`)
+- Keep your client secrets secure
+- Rotate credentials if they are ever exposed
+- For production deployments, use environment-specific credentials
+
+#### Testing OAuth Configuration
+
+1. Start the application:
+   ```bash
+   npm start
+   ```
+
+2. Click "Sign in with Google" or "Sign in with GitHub"
+3. You should see an OAuth consent screen
+4. After authorizing, you'll be redirected back to the application
+5. Check the developer console for any errors
+
+#### Fallback Mode
+
+If OAuth is not configured, the application will fall back to a mock authentication mode for development/testing purposes. This mode:
+- Allows login without real OAuth providers
+- Creates mock user sessions
+- Useful for development without OAuth setup
+- **Not suitable for production use**
+
 ### Ollama Setup (For AI Features)
+
+AI-powered features require Ollama to be installed and running locally.
 
 1. **Install Ollama**
    - Visit https://ollama.ai
@@ -499,6 +584,191 @@ Modify `package.json` under the `build` section:
 ### License
 
 See LICENSE file for licensing information.
+
+## Screenshots and Visual Guide
+
+This section provides visual guidance for installation, configuration, and usage.
+
+### Installation Screenshots
+
+#### Windows Installation
+
+**Step 1: Download Installer**
+<!-- TODO: Add screenshot of Windows installer download -->
+- Locate the `.exe` installer in the release folder
+- File name: `MergePR Cockpit Setup X.X.X.exe`
+
+**Step 2: Windows SmartScreen**
+<!-- TODO: Add screenshot of SmartScreen warning -->
+- If prompted, click "More info" then "Run anyway"
+- This is normal for new applications
+
+**Step 3: Installation Wizard**
+<!-- TODO: Add screenshot of installation wizard -->
+- Accept license agreement
+- Choose installation directory
+- Select Start Menu folder
+- Create desktop shortcut (optional)
+
+**Step 4: Completed Installation**
+<!-- TODO: Add screenshot of successful installation -->
+- Application installed successfully
+- Ready to launch
+
+#### macOS Installation
+
+**Step 1: Open DMG**
+<!-- TODO: Add screenshot of DMG window -->
+- Double-click the `.dmg` file
+- Finder window opens with application
+
+**Step 2: Drag to Applications**
+<!-- TODO: Add screenshot of drag-and-drop -->
+- Drag "MergePR Cockpit" icon to Applications folder
+- Wait for copy to complete
+
+**Step 3: Gatekeeper Prompt**
+<!-- TODO: Add screenshot of Gatekeeper dialog -->
+- Right-click app → Open
+- Click "Open" in the Gatekeeper dialog
+
+**Step 4: Application Running**
+<!-- TODO: Add screenshot of app on macOS -->
+- Application successfully launched
+
+#### Linux Installation
+
+**AppImage Method**
+<!-- TODO: Add screenshot of AppImage execution -->
+```bash
+chmod +x MergePR-Cockpit-*.AppImage
+./MergePR-Cockpit-*.AppImage
+```
+
+**DEB Package Method**
+<!-- TODO: Add screenshot of terminal installation -->
+```bash
+sudo dpkg -i mergeprcockpit_*.deb
+sudo apt-get install -f  # Fix dependencies if needed
+```
+
+### OAuth Configuration Screenshots
+
+#### Google OAuth Setup
+
+**Step 1: Google Cloud Console**
+<!-- TODO: Add screenshot of Google Cloud Console credentials page -->
+- Navigate to APIs & Services → Credentials
+- Click "Create Credentials" → "OAuth 2.0 Client ID"
+
+**Step 2: OAuth Consent Screen**
+<!-- TODO: Add screenshot of consent screen configuration -->
+- Configure application name and details
+- Add required scopes
+
+**Step 3: Create Client ID**
+<!-- TODO: Add screenshot of client ID creation -->
+- Select "Desktop app" as application type
+- Note down Client ID and Client Secret
+
+#### GitHub OAuth Setup
+
+**Step 1: GitHub Developer Settings**
+<!-- TODO: Add screenshot of GitHub OAuth Apps page -->
+- Go to Settings → Developer settings → OAuth Apps
+- Click "New OAuth App"
+
+**Step 2: Register Application**
+<!-- TODO: Add screenshot of OAuth app registration form -->
+- Fill in application details
+- Set callback URL to `http://localhost:3000/oauth/callback`
+
+**Step 3: Client Credentials**
+<!-- TODO: Add screenshot of client ID and secret -->
+- Copy Client ID
+- Generate and copy Client Secret
+
+### Application Usage Screenshots
+
+#### Login Screen
+
+**Main Login Interface**
+<!-- TODO: Add screenshot of login screen -->
+- Google OAuth button
+- GitHub OAuth button
+- Email/Password form
+- All authentication options available
+
+**OAuth Flow**
+<!-- TODO: Add screenshot of OAuth consent screen -->
+- User authorizes application
+- Redirected back to MergePR Cockpit
+- Logged in successfully
+
+#### Main Dashboard
+
+**Repository Selection**
+<!-- TODO: Add screenshot of repository selector -->
+- Enter GitHub username or organization
+- Select repository from dropdown
+- Load pull requests
+
+**Pull Request List**
+<!-- TODO: Add screenshot of PR list view -->
+- View all open/closed/merged PRs
+- Filter and sort options
+- Click to view details
+
+#### Pull Request Details
+
+**PR Detail View**
+<!-- TODO: Add screenshot of PR detail page -->
+- PR metadata and description
+- File changes summary
+- Merge options
+
+**AI Analysis**
+<!-- TODO: Add screenshot of Ollama analysis results -->
+- Risk assessment
+- Suggested reviewers
+- Potential issues
+- Remediation suggestions
+
+#### Analytics Dashboard
+
+**Repository Metrics**
+<!-- TODO: Add screenshot of analytics view -->
+- PR statistics
+- Merge time charts
+- Conflict trends
+- Activity graphs
+
+### Troubleshooting Screenshots
+
+#### Common Error Messages
+
+**OAuth Configuration Error**
+<!-- TODO: Add screenshot of OAuth error -->
+- Missing or invalid credentials
+- Check .env file configuration
+
+**GitHub API Rate Limit**
+<!-- TODO: Add screenshot of rate limit message -->
+- 60 requests/hour limit reached
+- Wait or configure authentication
+
+**Ollama Connection Error**
+<!-- TODO: Add screenshot of Ollama offline message -->
+- Ollama service not running
+- Start Ollama with `ollama serve`
+
+### Video Tutorials (Future)
+
+Future releases will include video tutorials for:
+- Complete installation walkthrough
+- OAuth setup guide
+- First-time user onboarding
+- Advanced features demonstration
 
 ---
 

@@ -72,3 +72,31 @@ export interface OllamaAnalysis {
   potentialIssues: string[];
   suggestions: string[];
 }
+
+// Electron API types
+export interface OAuthTokenResponse {
+  access_token: string;
+  token_type: string;
+  expires_in?: number;
+  refresh_token?: string;
+}
+
+export interface UserInfo {
+  id: string;
+  email: string;
+  name: string;
+  picture?: string;
+}
+
+declare global {
+  interface Window {
+    electronAPI?: {
+      getAuthToken: () => Promise<any>;
+      setAuthToken: (token: string) => Promise<boolean>;
+      clearAuthToken: () => Promise<boolean>;
+      oauthGoogle: () => Promise<OAuthTokenResponse>;
+      oauthGitHub: () => Promise<OAuthTokenResponse>;
+      getUserInfo: (accessToken: string, provider: string) => Promise<UserInfo>;
+    };
+  }
+}
