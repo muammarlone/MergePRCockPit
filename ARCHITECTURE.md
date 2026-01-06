@@ -1,383 +1,640 @@
-# MergePR Cockpit - Architecture Documentation
+# MergePRCockPit Architecture
 
-## Overview
+## Executive Summary
 
-MergePR Cockpit is built following TOGAF (The Open Group Architecture Framework) principles with a focus on modularity, extensibility, and separation of concerns. This document describes the architectural design and key decisions.
+MergePRCockPit is evolving from a simple PR review tool into a comprehensive, modular, on-premises GitOps platform. This architecture document follows TOGAF (The Open Group Architecture Framework) principles to ensure enterprise-grade design, modularity, and extensibility.
 
-## Architecture Principles
+## Table of Contents
 
-1. **Modularity**: Each component has a single, well-defined responsibility
-2. **Extensibility**: New features can be added without modifying core components
-3. **Separation of Concerns**: Clear boundaries between UI, business logic, and data access
-4. **Security First**: Authentication and authorization are enforced at all layers
-5. **Platform Independence**: Core business logic is platform-agnostic
+1. [Architecture Vision](#architecture-vision)
+2. [Business Architecture](#business-architecture)
+3. [Data Architecture](#data-architecture)
+4. [Application Architecture](#application-architecture)
+5. [Technology Architecture](#technology-architecture)
+6. [Security Architecture](#security-architecture)
+7. [Deployment Architecture](#deployment-architecture)
 
-## System Architecture
+---
 
-### High-Level Architecture
+## 1. Architecture Vision
+
+### 1.1 Strategic Goals
+
+- **Modularity**: Each component is independently deployable and composable
+- **Extensibility**: Plugin-based architecture for custom integrations
+- **AI-First**: Integrated AI assistants across all workflows
+- **On-Premises**: Full control and data sovereignty
+- **Enterprise-Ready**: Scalable, secure, and compliant
+
+### 1.2 Architecture Principles
+
+| Principle | Rationale | Implications |
+|-----------|-----------|--------------|
+| **Microservices Architecture** | Enables independent scaling and deployment | Each module runs as separate service |
+| **Event-Driven Design** | Loose coupling between components | Use message bus for inter-service communication |
+| **API-First** | Standardized interfaces | All services expose REST/GraphQL APIs |
+| **Infrastructure as Code** | Repeatable deployments | Use Kubernetes, Terraform, Helm |
+| **Observability by Design** | Production readiness | Built-in metrics, logs, traces |
+| **Security by Default** | Zero-trust architecture | Authentication, authorization, encryption |
+
+### 1.3 Architectural Constraints
+
+- Must run on-premises (air-gapped environments supported)
+- Must support multiple Git providers (GitHub, GitLab, Bitbucket, Gitea)
+- Must scale from single-user to enterprise (1000+ users)
+- Must maintain backward compatibility with existing data
+
+---
+
+## 2. Business Architecture
+
+### 2.1 Business Capabilities
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     Presentation Layer                       │
-│  ┌────────────┐  ┌────────────┐  ┌────────────────────────┐│
-│  │   Login    │  │ Dashboard  │  │  PR Management & AI    ││
-│  └────────────┘  └────────────┘  └────────────────────────┘│
-└─────────────────────────────────────────────────────────────┘
-                            │
-┌─────────────────────────────────────────────────────────────┐
-│                   Business Logic Layer                       │
-│  ┌────────────┐  ┌────────────┐  ┌────────────────────────┐│
-│  │   Auth     │  │  GitHub    │  │      Ollama AI         ││
-│  │  Service   │  │  Service   │  │      Service           ││
-│  └────────────┘  └────────────┘  └────────────────────────┘│
-└─────────────────────────────────────────────────────────────┘
-                            │
-┌─────────────────────────────────────────────────────────────┐
-│                   Data Access Layer                          │
-│  ┌────────────┐  ┌────────────┐  ┌────────────────────────┐│
-│  │   Local    │  │  GitHub    │  │     Ollama API         ││
-│  │  Storage   │  │    API     │  │                        ││
-│  └────────────┘  └────────────┘  └────────────────────────┘│
-└─────────────────────────────────────────────────────────────┘
-                            │
-┌─────────────────────────────────────────────────────────────┐
-│                    Platform Layer                            │
-│                   Electron Framework                         │
-│  ┌────────────┐  ┌────────────┐  ┌────────────────────────┐│
-│  │   Main     │  │  Preload   │  │    Renderer            ││
-│  │  Process   │  │  Scripts   │  │    Process             ││
-│  └────────────┘  └────────────┘  └────────────────────────┘│
+│                   MergePRCockPit Platform                    │
+├─────────────────────────────────────────────────────────────┤
+│  Git Operations  │  Issue Mgmt  │  PR Analytics  │  AI Core │
+├─────────────────────────────────────────────────────────────┤
+│         Trust Fabric & Compliance Infrastructure             │
+├─────────────────────────────────────────────────────────────┤
+│              Plugin Framework & Extension API                │
+├─────────────────────────────────────────────────────────────┤
+│         Observability, Monitoring & Audit Logging            │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Layer Descriptions
+### 2.2 Value Streams
 
-### 1. Presentation Layer
+1. **Git Operations Stream**: Clone → Move → Reorganize → Preview → Rollback
+2. **Issue Management Stream**: Create → Tag → Track → Analyze → Close
+3. **PR Review Stream**: Submit → Review → Analyze → Merge → Audit
+4. **AI Enhancement Stream**: Collect Data → Train → Predict → Recommend → Learn
 
-**Responsibility**: User interface and user interaction
+### 2.3 Stakeholders
+
+- **Developers**: Primary users for PR reviews and Git operations
+- **Team Leads**: Users of analytics and reporting
+- **DevOps Engineers**: Platform administrators
+- **Compliance Officers**: Audit and compliance stakeholders
+- **Executives**: Strategic decision-makers using insights
+
+---
+
+## 3. Data Architecture
+
+### 3.1 Data Domains
+
+#### Core Entities
+
+```
+Repository
+├── Metadata (name, URL, provider, created_at)
+├── Branches
+├── Commits
+└── Configuration
+
+PullRequest
+├── Metadata (title, description, author, state)
+├── Reviews
+├── Comments
+├── Commits
+├── Files Changed
+└── Analytics Data
+
+Issue
+├── Metadata (title, description, assignee, state)
+├── Labels/Tags
+├── Comments
+├── Links (PRs, commits)
+└── Analytics Data
+
+User
+├── Profile
+├── Permissions
+└── Activity History
+
+Analytics
+├── PR Metrics
+├── Issue Metrics
+├── Code Quality Metrics
+└── Team Performance Data
+```
+
+### 3.2 Data Storage Strategy
+
+| Data Type | Storage | Rationale |
+|-----------|---------|-----------|
+| **Git Repositories** | Object Storage + Local Cache | Performance and scalability |
+| **Metadata** | PostgreSQL | ACID compliance for transactional data |
+| **Analytics/Metrics** | TimescaleDB | Time-series optimization |
+| **Search Indexes** | Elasticsearch | Full-text search capabilities |
+| **Cache** | Redis | High-performance caching |
+| **Audit Logs** | Immutable Log Store | Compliance and forensics |
+| **AI Models** | Model Registry (MLflow) | Version control for ML models |
+
+### 3.3 Data Governance
+
+- **Data Retention**: Configurable policies per data type
+- **Data Privacy**: GDPR/CCPA compliance built-in
+- **Data Lineage**: Track data flow for audit
+- **Backup Strategy**: Automated daily backups with point-in-time recovery
+
+---
+
+## 4. Application Architecture
+
+### 4.1 Module Overview
+
+#### 4.1.1 Git Operations Engine
+
+**Purpose**: Core git operations with advanced features
 
 **Components**:
-- **Login**: Authentication UI supporting Google, GitHub, and email
-- **Dashboard**: Main application interface with repository selection
-- **RepositorySelector**: Repository owner and name selection
-- **PullRequestList**: List view of PRs with filtering
-- **PullRequestDetail**: Detailed PR view with merge capabilities
-- **Analytics**: Repository metrics and visualization
+- Repository Manager
+- Branch Manager
+- Merge Engine
+- Conflict Resolver
+- Preview Generator
+- Rollback Manager
+- Repository Migration Tool
 
-**Technology**: React 18 with TypeScript, CSS modules
+**Key Features**:
+- Multi-repository operations
+- Safe preview before commit
+- Atomic rollback capabilities
+- Repository reorganization
+- Cross-provider migration
 
-**Design Patterns**:
-- Component-based architecture
-- Unidirectional data flow
-- State management via React hooks
-- Separation of presentational and container components
-
-### 2. Business Logic Layer
-
-**Responsibility**: Application logic and workflows
-
-**Services**:
-
-#### AuthService
-- User authentication (Google, GitHub, Email)
-- Token management
-- Session persistence
-- Authentication state management
-
-**Key Methods**:
-```typescript
-- loginWithGoogle(): Promise<User>
-- loginWithGitHub(): Promise<User>
-- loginWithEmail(email, password): Promise<User>
-- logout(): Promise<void>
-- isAuthenticated(): boolean
-- getAccessToken(): string | null
+**APIs**:
+```
+POST /api/v1/repos/clone
+POST /api/v1/repos/{id}/reorganize
+GET  /api/v1/repos/{id}/preview
+POST /api/v1/repos/{id}/rollback
+POST /api/v1/repos/migrate
 ```
 
-#### GitHubService
-- Repository operations
-- Pull request management
-- Metrics calculation
-- GitHub API abstraction
+#### 4.1.2 Advanced Issue Management
 
-**Key Methods**:
-```typescript
-- getRepositories(owner): Promise<Repository[]>
-- getPullRequests(owner, repo, state): Promise<PullRequest[]>
-- getPullRequest(owner, repo, number): Promise<PullRequest>
-- mergePullRequest(owner, repo, number): Promise<boolean>
-- getRepositoryMetrics(owner, repo): Promise<RepositoryMetrics>
-```
-
-#### OllamaService
-- AI-powered PR analysis
-- Risk assessment
-- Suggestion generation
-- GPT export functionality
-
-**Key Methods**:
-```typescript
-- analyzePullRequest(pr): Promise<OllamaAnalysis>
-- testConnection(): Promise<boolean>
-- exportToGPT(context): Promise<string>
-```
-
-### 3. Data Access Layer
-
-**Responsibility**: External data integration and persistence
+**Purpose**: Enterprise-grade issue tracking and analytics
 
 **Components**:
+- Issue Lifecycle Manager
+- Tagging & Classification Engine
+- Issue Analytics Engine
+- SLA & Workflow Manager
+- Integration Adapters (Jira, Linear, etc.)
 
-#### Local Storage
-- Authentication token persistence
-- User preferences
-- Session data
-- Implemented using browser localStorage and Electron Store
+**Key Features**:
+- Custom issue types and workflows
+- Advanced search and filtering
+- Burndown and velocity charts
+- SLA tracking and alerts
+- Cross-repository issue linking
 
-#### GitHub API
-- RESTful API integration via Octokit
-- Rate limiting handling
-- Error management
-- Response caching (future enhancement)
+**APIs**:
+```
+POST /api/v1/issues
+GET  /api/v1/issues/{id}
+PUT  /api/v1/issues/{id}
+GET  /api/v1/issues/analytics
+POST /api/v1/issues/{id}/link
+```
 
-#### Ollama API
-- HTTP REST API to local Ollama instance
-- Streaming support (for future use)
-- Fallback handling when unavailable
+#### 4.1.3 PR Review & Analytics Suite
 
-### 4. Platform Layer
-
-**Responsibility**: Platform-specific functionality
+**Purpose**: Intelligent PR review with AI-powered insights
 
 **Components**:
+- Review Dashboard
+- Code Quality Analyzer
+- Review Time Predictor
+- Merge Conflict Detector
+- Review Assignment Engine
+- Performance Metrics Collector
 
-#### Main Process (main.ts)
-- Window management
-- Application lifecycle
-- IPC communication
-- System integration
+**Key Features**:
+- AI-suggested reviewers
+- Estimated review time
+- Code quality gates
+- Review bottleneck detection
+- Team performance analytics
 
-#### Preload Scripts (preload.ts)
-- Context bridge for secure IPC
-- Exposed APIs for renderer
-- Security boundary enforcement
-
-#### Renderer Process
-- Web content rendering
-- User interaction handling
-- React application execution
-
-## Security Architecture
-
-### Authentication Flow
-
+**APIs**:
 ```
-User → Login Component → AuthService → OAuth Provider
-                              ↓
-                         Token Storage
-                              ↓
-                      Protected Components
+GET  /api/v1/prs
+GET  /api/v1/prs/{id}/analytics
+POST /api/v1/prs/{id}/review
+GET  /api/v1/prs/dashboard
+GET  /api/v1/prs/metrics
 ```
 
-### Security Measures
+#### 4.1.4 AI Assistant Modules
 
-1. **Context Isolation**: Electron's context isolation prevents direct access to Node.js APIs
-2. **IPC Security**: Only whitelisted APIs are exposed via contextBridge
-3. **Token Security**: Tokens stored securely in localStorage with expiration
-4. **HTTPS**: All external API calls use HTTPS
-5. **Input Validation**: All user inputs are validated before processing
+**Purpose**: AI-powered intelligence across all operations
 
-## Data Flow
+**Components**:
+- PR Review Assistant (code review suggestions)
+- Merge Intelligence (conflict prediction, optimal merge strategy)
+- Issue Classifier (auto-tagging, priority prediction)
+- Analytics Assistant (insight generation, anomaly detection)
+- Decision Support Engine (recommendation system)
 
-### Pull Request Retrieval Flow
+**Key Features**:
+- Natural language queries
+- Automated code review comments
+- Merge risk prediction
+- Issue triage automation
+- Performance anomaly detection
 
+**APIs**:
 ```
-User Selection
-    ↓
-Dashboard Component
-    ↓
-GitHubService.getPullRequests()
-    ↓
-Octokit API Call
-    ↓
-Response Processing
-    ↓
-State Update
-    ↓
-UI Render
-```
-
-### AI Analysis Flow
-
-```
-PR Detail View
-    ↓
-OllamaService.analyzePullRequest()
-    ↓
-Build Analysis Prompt
-    ↓
-Ollama API Call
-    ↓
-Parse Response
-    ↓
-Display Results
+POST /api/v1/ai/review
+POST /api/v1/ai/predict-merge
+POST /api/v1/ai/classify-issue
+GET  /api/v1/ai/insights
+POST /api/v1/ai/query
 ```
 
-## Design Patterns
+#### 4.1.5 Trust Fabric Architecture
 
-### Service Layer Pattern
-All business logic is encapsulated in service classes that can be easily tested and reused.
+**Purpose**: Provenance tracking, compliance, and audit
 
-### Observer Pattern
-React's state management system implements the observer pattern for reactive UI updates.
+**Components**:
+- Provenance Tracker
+- Compliance Engine
+- Audit Logger
+- Digital Signature Manager
+- Supply Chain Security Scanner
 
-### Singleton Pattern
-Services are implemented as singletons to maintain consistent state across the application.
+**Key Features**:
+- Full audit trail for all operations
+- Compliance policy enforcement
+- Code provenance tracking
+- Supply chain security (SBOM, vulnerability scanning)
+- Digital signatures for commits and releases
 
-### Factory Pattern
-Component creation follows the factory pattern through React's component model.
-
-## Extensibility Points
-
-### Plugin Framework (Future)
-The architecture is designed to support plugins through:
-- Service injection
-- Event bus for inter-component communication
-- Well-defined interfaces
-- Configuration-based loading
-
-### Supported Extensions
-1. **Custom Authentication Providers**: Add new OAuth providers
-2. **Additional Analytics**: Extend metrics and visualizations
-3. **AI Models**: Support additional AI services beyond Ollama
-4. **File Operations**: Add support for additional file types
-5. **Git Operations**: Extend with advanced Git functionality
-
-## Technology Decisions
-
-### Why Electron?
-- Cross-platform desktop application support
-- Access to Node.js for advanced functionality
-- Local file system access for future features
-- Native integrations possible
-
-### Why React?
-- Component-based architecture aligns with modularity goals
-- Large ecosystem and community
-- Excellent TypeScript support
-- Virtual DOM for performance
-
-### Why TypeScript?
-- Type safety reduces bugs
-- Better IDE support
-- Self-documenting code
-- Easier refactoring
-
-### Why Octokit?
-- Official GitHub API library
-- Well-maintained and documented
-- TypeScript support
-- Built-in retry and rate limiting
-
-## Performance Considerations
-
-### Current Optimizations
-1. **Lazy Loading**: Components loaded on demand
-2. **Memoization**: React.memo for expensive components
-3. **Virtual Rendering**: List virtualization for large PR lists (future)
-4. **API Caching**: Response caching to reduce API calls (future)
-
-### Scalability
-- Service layer can be moved to backend for large deployments
-- Database integration possible for enhanced performance
-- Microservices architecture ready if needed
-
-## Testing Strategy
-
-### Unit Tests
-- Service layer thoroughly tested
-- Authentication flows validated
-- Mocked external dependencies
-
-### Integration Tests
-- GitHub API integration tests
-- End-to-end authentication flows
-- Component integration tests
-
-### E2E Tests (Future)
-- Full user workflows
-- Cross-platform testing
-- Performance benchmarks
-
-## Deployment Architecture
-
-### Development
+**APIs**:
 ```
-localhost:3000 (React Dev Server) → Electron Main Process
+GET  /api/v1/audit/logs
+GET  /api/v1/compliance/status
+POST /api/v1/compliance/policy
+GET  /api/v1/provenance/{artifact}
+GET  /api/v1/security/scan
 ```
 
-### Production
+#### 4.1.6 Extensible Plugin Framework
+
+**Purpose**: Enable custom extensions and integrations
+
+**Components**:
+- Plugin Registry
+- Plugin Loader
+- Hook System
+- Extension API
+- Marketplace (future)
+
+**Key Features**:
+- Dynamic plugin loading
+- Sandboxed execution
+- Version compatibility management
+- Hook points across all modules
+- Plugin marketplace (roadmap)
+
+**Plugin Types**:
+- Authentication Providers
+- Git Provider Adapters
+- Notification Channels
+- Custom Analytics Widgets
+- AI Model Providers
+- Workflow Automations
+
+**APIs**:
 ```
-Bundled React App → Electron Main Process → Installed Application
+POST /api/v1/plugins/install
+GET  /api/v1/plugins
+PUT  /api/v1/plugins/{id}/enable
+GET  /api/v1/plugins/hooks
 ```
 
-### Distribution
-- Electron Builder creates platform-specific installers
-- NSIS for Windows
-- DMG for macOS
-- AppImage/deb for Linux
+### 4.2 Component Interaction
 
-## Future Enhancements
+```
+┌─────────────────────────────────────────────────────────────┐
+│                         Web UI / CLI                         │
+└───────────────────────────┬─────────────────────────────────┘
+                            │
+┌───────────────────────────▼─────────────────────────────────┐
+│                      API Gateway                             │
+│              (Authentication, Rate Limiting)                 │
+└─────┬────────┬────────┬────────┬────────┬──────────┬────────┘
+      │        │        │        │        │          │
+      ▼        ▼        ▼        ▼        ▼          ▼
+┌──────────┐ ┌──────┐ ┌──────┐ ┌─────┐ ┌────────┐ ┌────────┐
+│   Git    │ │Issue │ │  PR  │ │ AI  │ │ Trust  │ │ Plugin │
+│Operations│ │ Mgmt │ │Review│ │Core │ │ Fabric │ │ Engine │
+└────┬─────┘ └───┬──┘ └───┬──┘ └──┬──┘ └───┬────┘ └───┬────┘
+     │           │        │       │        │          │
+     └───────────┴────────┴───────┴────────┴──────────┘
+                            │
+                ┌───────────▼────────────┐
+                │    Message Bus         │
+                │  (Events & Commands)   │
+                └───────────┬────────────┘
+                            │
+     ┌──────────────────────┼──────────────────────┐
+     │                      │                      │
+┌────▼─────┐      ┌─────────▼────────┐   ┌────────▼────────┐
+│PostgreSQL│      │  TimescaleDB     │   │  Elasticsearch  │
+│(Metadata)│      │  (Analytics)     │   │    (Search)     │
+└──────────┘      └──────────────────┘   └─────────────────┘
+```
 
-### Planned Architecture Improvements
+### 4.3 Integration Patterns
 
-1. **Backend Service** (Optional)
-   - Centralized authentication
-   - Enhanced caching
-   - Multi-user support
-   - Audit logging
+- **Synchronous**: REST APIs for CRUD operations
+- **Asynchronous**: Message queue for background jobs
+- **Event-Driven**: Event bus for inter-module communication
+- **Webhooks**: External system integration
+- **GraphQL**: Flexible querying for UI
 
-2. **Database Integration**
-   - SQLite for local data
-   - Historical analytics
-   - Offline support
+---
 
-3. **Microservices**
-   - Separate AI service
-   - Dedicated file processing service
-   - Analytics service
+## 5. Technology Architecture
 
-4. **Trust Fabric**
-   - Provenance tracking
-   - Compliance monitoring
-   - Audit trails
+### 5.1 Technology Stack
 
-5. **Observability**
-   - Logging framework
-   - Metrics collection
-   - Error tracking
-   - Performance monitoring
+#### Backend Services
+- **Language**: Go (performance), Python (AI/ML), Node.js (real-time)
+- **Framework**: Go: Gin/Fiber, Python: FastAPI, Node: Express
+- **API**: REST + GraphQL (Apollo/Hasura)
+- **Message Queue**: NATS/RabbitMQ
+- **Cache**: Redis
+- **Database**: PostgreSQL, TimescaleDB
+- **Search**: Elasticsearch/OpenSearch
+- **Object Storage**: MinIO (S3-compatible)
 
-## Compliance with TOGAF
+#### Frontend
+- **Framework**: React/Next.js or Vue/Nuxt
+- **State Management**: Redux/Zustand or Pinia
+- **UI Library**: Material-UI, Ant Design, or Tailwind
+- **Charts**: Recharts, Chart.js
+- **Real-time**: WebSockets/Server-Sent Events
 
-### Architecture Development Method (ADM)
+#### AI/ML Stack
+- **Framework**: PyTorch, TensorFlow
+- **Model Serving**: TorchServe, TensorFlow Serving
+- **MLOps**: MLflow, Kubeflow
+- **NLP**: Transformers (Hugging Face)
+- **Vector DB**: Qdrant, Milvus (for embeddings)
 
-**Phase A - Architecture Vision**: Defined in Epic #1
-**Phase B - Business Architecture**: GitOps workflows documented
-**Phase C - Information Systems Architecture**: This document
-**Phase D - Technology Architecture**: Platform and technology choices documented
-**Phase E - Opportunities & Solutions**: Roadmap in Issues #4, #5
-**Phase F - Migration Planning**: Phased delivery approach
-**Phase G - Implementation Governance**: Code reviews and testing
-**Phase H - Architecture Change Management**: Version control and CI/CD
+#### Infrastructure
+- **Container**: Docker
+- **Orchestration**: Kubernetes
+- **Service Mesh**: Istio (optional for large deployments)
+- **IaC**: Terraform, Helm
+- **CI/CD**: GitLab CI, GitHub Actions, ArgoCD
+- **Monitoring**: Prometheus, Grafana
+- **Logging**: ELK Stack or Loki
+- **Tracing**: Jaeger, OpenTelemetry
 
-### Architecture Principles Alignment
+### 5.2 Development Tools
 
-1. **Business Principles**: Support GitOps workflows efficiently
-2. **Data Principles**: Secure data handling, user privacy
-3. **Application Principles**: Modular, extensible, maintainable
-4. **Technology Principles**: Open standards, platform independence
+- **Version Control**: Git
+- **Code Quality**: SonarQube, CodeQL
+- **Security Scanning**: Trivy, Snyk
+- **Documentation**: Swagger/OpenAPI, Docusaurus
+- **Testing**: Jest, Pytest, Go test, Playwright
 
-## Conclusion
+---
 
-The MergePR Cockpit architecture provides a solid foundation for a consumer-grade GitOps platform. The modular design allows for incremental enhancement while maintaining stability and security. The clear separation of concerns enables parallel development and easy testing, while TOGAF alignment ensures enterprise-grade architectural quality.
+## 6. Security Architecture
+
+### 6.1 Security Layers
+
+#### Authentication & Authorization
+- **Multi-factor Authentication** (MFA)
+- **SSO Integration** (SAML, OAuth2, LDAP)
+- **Role-Based Access Control** (RBAC)
+- **Attribute-Based Access Control** (ABAC)
+- **API Key Management**
+
+#### Data Security
+- **Encryption at Rest**: AES-256
+- **Encryption in Transit**: TLS 1.3
+- **Secrets Management**: HashiCorp Vault
+- **Key Rotation**: Automated
+- **Data Masking**: PII protection
+
+#### Network Security
+- **Network Segmentation**: Kubernetes Network Policies
+- **Firewall Rules**: Ingress/Egress controls
+- **DDoS Protection**: Rate limiting
+- **WAF**: Web Application Firewall
+
+#### Application Security
+- **Input Validation**: All user inputs
+- **SQL Injection Prevention**: Parameterized queries
+- **XSS Prevention**: Content Security Policy
+- **CSRF Protection**: Token-based
+- **Dependency Scanning**: Automated CVE checks
+
+### 6.2 Compliance
+
+- **SOC 2 Type II** (roadmap)
+- **GDPR** compliance
+- **HIPAA** ready (healthcare deployments)
+- **FedRAMP** (government deployments - roadmap)
+
+### 6.3 Audit & Forensics
+
+- **Immutable Audit Logs**
+- **User Activity Tracking**
+- **Change Management Logs**
+- **Security Event Monitoring**
+- **Incident Response Procedures**
+
+---
+
+## 7. Deployment Architecture
+
+### 7.1 Deployment Models
+
+#### 7.1.1 Single-Node (Development/Small Teams)
+
+```
+┌─────────────────────────────────────┐
+│         Single Server               │
+│  ┌──────────────────────────────┐  │
+│  │  Docker Compose              │  │
+│  │  - Web UI                    │  │
+│  │  - API Gateway               │  │
+│  │  - All Services              │  │
+│  │  - PostgreSQL                │  │
+│  │  - Redis                     │  │
+│  └──────────────────────────────┘  │
+└─────────────────────────────────────┘
+```
+
+**Requirements**:
+- CPU: 4 cores
+- RAM: 16 GB
+- Storage: 100 GB SSD
+- Users: 1-50
+
+#### 7.1.2 High-Availability Cluster (Enterprise)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Kubernetes Cluster                        │
+│  ┌───────────────┐  ┌───────────────┐  ┌─────────────────┐ │
+│  │  Control Plane│  │  Worker Nodes │  │  Worker Nodes   │ │
+│  │               │  │  (Services)   │  │  (Services)     │ │
+│  └───────────────┘  └───────────────┘  └─────────────────┘ │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │          Persistent Storage (Rook/Ceph)                │ │
+│  └────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+         │                    │                    │
+         ▼                    ▼                    ▼
+  ┌───────────┐        ┌───────────┐        ┌──────────┐
+  │PostgreSQL │        │TimescaleDB│        │  Redis   │
+  │ Cluster   │        │  Cluster  │        │ Cluster  │
+  └───────────┘        └───────────┘        └──────────┘
+```
+
+**Requirements**:
+- Nodes: 3-10+ (depending on scale)
+- CPU per node: 8-16 cores
+- RAM per node: 32-64 GB
+- Storage: 1+ TB distributed
+- Users: 100-10,000+
+
+### 7.2 Scaling Strategy
+
+#### Horizontal Scaling
+- **Stateless Services**: Auto-scale based on CPU/memory
+- **Stateful Services**: Sharding and replication
+- **Database**: Read replicas, connection pooling
+- **Cache**: Redis Cluster
+
+#### Vertical Scaling
+- Resize nodes for resource-intensive operations
+- Dedicated nodes for AI/ML workloads
+
+### 7.3 Disaster Recovery
+
+- **RTO** (Recovery Time Objective): < 4 hours
+- **RPO** (Recovery Point Objective): < 1 hour
+- **Backup Strategy**: Daily full, hourly incremental
+- **Multi-Region**: Optional for high availability
+
+### 7.4 Monitoring & Observability
+
+#### Metrics
+- Service health and performance
+- Resource utilization
+- Business metrics (PR throughput, review time)
+- Custom plugin metrics
+
+#### Logging
+- Centralized log aggregation
+- Log retention policies
+- Log-based alerting
+
+#### Tracing
+- Distributed tracing across services
+- Performance bottleneck identification
+- Request flow visualization
+
+#### Alerting
+- PagerDuty/Opsgenie integration
+- Slack/Teams notifications
+- Email alerts
+- Custom webhook support
+
+---
+
+## 8. Migration & Evolution Strategy
+
+### 8.1 MVP to Full Platform Path
+
+```
+Phase 1: MVP Cockpit (Current)
+    ↓
+Phase 2: Core Platform
+    - Git Operations Engine
+    - Basic PR Review
+    ↓
+Phase 3: Enhanced Platform
+    - Issue Management
+    - PR Analytics
+    - Basic AI Integration
+    ↓
+Phase 4: AI-Powered Platform
+    - Advanced AI Assistants
+    - Trust Fabric
+    ↓
+Phase 5: Full Platform
+    - Plugin Marketplace
+    - Advanced Analytics
+    - Multi-tenancy
+```
+
+### 8.2 Backward Compatibility
+
+- API versioning (v1, v2, etc.)
+- Data migration scripts
+- Feature flags for gradual rollout
+- Deprecation notices (6-month minimum)
+
+### 8.3 Extensibility Points
+
+- Plugin hooks in all modules
+- Custom UI components
+- Custom AI models
+- Custom workflow engines
+- Custom notification channels
+
+---
+
+## 9. Conclusion
+
+This architecture provides a solid foundation for evolving MergePRCockPit from a simple PR review tool into a comprehensive, enterprise-grade, on-premises GitOps platform. The modular design ensures:
+
+- **Independent module development** and deployment
+- **Flexibility** to adopt components incrementally
+- **Scalability** from single-user to enterprise
+- **Extensibility** through plugins and APIs
+- **Future-proof** design aligned with industry standards
+
+The architecture follows TOGAF principles and is designed to support Lean Startup methodology through incremental, validated delivery of value.
+
+---
+
+## Appendix
+
+### A. Glossary
+
+- **TOGAF**: The Open Group Architecture Framework
+- **RBAC**: Role-Based Access Control
+- **ABAC**: Attribute-Based Access Control
+- **SBOM**: Software Bill of Materials
+- **SLA**: Service Level Agreement
+- **MLOps**: Machine Learning Operations
+- **IaC**: Infrastructure as Code
+
+### B. References
+
+- TOGAF 9.2 Specification
+- Twelve-Factor App Methodology
+- Kubernetes Best Practices
+- OWASP Top 10
+- NIST Cybersecurity Framework
+
+### C. Change Log
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2026-01-06 | System | Initial architecture design |
