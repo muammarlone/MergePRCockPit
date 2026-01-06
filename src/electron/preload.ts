@@ -5,5 +5,9 @@ import { contextBridge, ipcRenderer } from 'electron';
 contextBridge.exposeInMainWorld('electronAPI', {
   getAuthToken: () => ipcRenderer.invoke('get-auth-token'),
   setAuthToken: (token: string) => ipcRenderer.invoke('set-auth-token', token),
-  clearAuthToken: () => ipcRenderer.invoke('clear-auth-token')
+  clearAuthToken: () => ipcRenderer.invoke('clear-auth-token'),
+  oauthGoogle: () => ipcRenderer.invoke('oauth-google'),
+  oauthGitHub: () => ipcRenderer.invoke('oauth-github'),
+  getUserInfo: (accessToken: string, provider: string) => 
+    ipcRenderer.invoke('get-user-info', accessToken, provider),
 });

@@ -116,21 +116,38 @@ A consumer-grade on-premises GitOps cockpit for managing pull requests across mu
 
 ### First Time Setup
 
-1. **Launch the application**
+1. **Configure OAuth (Required for Production)**
+   
+   For real OAuth authentication, configure your credentials:
+   
+   ```bash
+   # Copy the example environment file
+   cp .env.example .env
+   ```
+   
+   Edit `.env` and add your OAuth credentials:
+   - **Google OAuth**: Get credentials from [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+   - **GitHub OAuth**: Get credentials from [GitHub Developer Settings](https://github.com/settings/developers)
+   
+   See [DEPLOYMENT.md](DEPLOYMENT.md#oauth-setup-required-for-authentication) for detailed setup instructions.
+   
+   **Note**: For development/testing, OAuth will fall back to mock authentication if not configured.
+
+2. **Launch the application**
    - Run the installed application or use `npm start` for development
 
-2. **Sign In**
+3. **Sign In**
    - Choose your preferred authentication method:
-     - Google OAuth
-     - GitHub OAuth
-     - Email/Password
+     - Google OAuth (configured via .env)
+     - GitHub OAuth (configured via .env)
+     - Email/Password (mock for development)
    
-3. **Select Repository**
+4. **Select Repository**
    - Enter a GitHub username or organization name
    - Click "Load Repositories"
    - Select a repository from the dropdown
 
-4. **Manage Pull Requests**
+5. **Manage Pull Requests**
    - View the list of pull requests
    - Click on any PR to see details
    - Use the Analytics tab to see repository metrics
