@@ -5,22 +5,26 @@ import { authService } from '../services/authService';
 import { RepositorySelector } from './RepositorySelector';
 import { PullRequestList } from './PullRequestList';
 import { Analytics } from './Analytics';
+import { EnhancedAnalytics } from './EnhancedAnalytics';
+import { RemediationDashboard } from './RemediationDashboard';
+import { FileOperations } from './FileOperations';
 import '../styles/Dashboard.css';
 
 export const Dashboard: React.FC = () => {
-  const [user, setUser] = useState(authService.getCurrentUser());
+  const user = authService.getCurrentUser();
   const [selectedOwner, setSelectedOwner] = useState('');
   const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
   const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
   const [metrics, setMetrics] = useState<RepositoryMetrics | null>(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'prs' | 'analytics'>('prs');
+  const [activeTab, setActiveTab] = useState<'prs' | 'analytics' | 'enhanced' | 'remediation' | 'files'>('prs');
 
   useEffect(() => {
     if (selectedRepo) {
       loadPullRequests();
       loadMetrics();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedRepo]);
 
   const loadPullRequests = async () => {
@@ -92,6 +96,24 @@ export const Dashboard: React.FC = () => {
               >
                 Analytics
               </button>
+              <button
+                className={activeTab === 'enhanced' ? 'active' : ''}
+                onClick={() => setActiveTab('enhanced')}
+              >
+                📊 Enhanced Analytics
+              </button>
+              <button
+                className={activeTab === 'remediation' ? 'active' : ''}
+                onClick={() => setActiveTab('remediation')}
+              >
+                🔧 Remediation
+              </button>
+              <button
+                className={activeTab === 'files' ? 'active' : ''}
+                onClick={() => setActiveTab('files')}
+              >
+                📁 File Ops
+              </button>
             </div>
 
             <div className="tab-content">
@@ -105,6 +127,21 @@ export const Dashboard: React.FC = () => {
               )}
               {activeTab === 'analytics' && metrics && (
                 <Analytics metrics={metrics} repository={selectedRepo} />
+              )}
+              {activeTab === 'enhanced' && (
+                <EnhancedAnalytics 
+                  repository={selectedRepo} 
+                  pullRequests={pullRequests}
+                />
+              )}
+              {activeTab === 'remediation' && (
+                <RemediationDashboard 
+                  repository={selectedRepo} 
+                  pullRequests={pullRequests}
+                />
+              )}
+              {activeTab === 'files' && (
+                <FileOperations repository={selectedRepo} />
               )}
             </div>
           </>

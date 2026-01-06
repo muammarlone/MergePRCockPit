@@ -22,6 +22,27 @@ A consumer-grade on-premises GitOps cockpit for managing pull requests across mu
 - Merge conflict trends
 - Visual charts and graphs (using Recharts)
 
+### 🚀 Enhanced Analytics & Predictive Intelligence (NEW)
+- **Repository Health Score**: 0-100 automated scoring with trend analysis
+- **Predictive Metrics**: AI-powered merge conflict probability and risk assessment
+- **30-Day Trends**: Historical PR activity, conflicts, and velocity tracking
+- **Advanced Visualizations**: Interactive charts with actionable insights
+- **Smart Recommendations**: Data-driven suggestions for workflow improvement
+
+### 🔧 Merge Conflict Remediation (NEW)
+- **Conflict Analysis**: Automated severity assessment and file identification
+- **AI-Powered Suggestions**: Intelligent remediation strategies via Ollama
+- **Multiple Resolution Paths**: Auto-resolve, rebase, merge, or manual options
+- **Confidence Scoring**: Each strategy rated with estimated time
+- **Pattern Recognition**: Common conflict detection and prevention tips
+
+### 📁 File Operations (NEW)
+- **Office File Support**: Upload/download .docx, .pptx, .xlsx, .pdf files
+- **Archive Support**: Handle .zip files with security validation
+- **Version Control**: Full Git integration with commit messages
+- **Security Checks**: Type validation, size limits, path sanitization
+- **Branch Support**: Work with any branch in the repository
+
 ### 🤖 AI-Powered Insights (Ollama Integration)
 - PR summaries
 - Risk assessment
@@ -240,9 +261,16 @@ For issues, questions, or contributions:
 
 ## Roadmap
 
-See [Issue #1](https://github.com/muammarlone/MergePRCockPit/issues/1) for the complete product roadmap including:
-- Advanced file operations (zip, docx, pptx)
-- Extended AI capabilities
-- Trust fabric integration
+See [Issue #1](https://github.com/muammarlone/MergePRCockPit/issues/1) for the complete product roadmap.
+
+### Recently Implemented ✅
+- **Enhanced Analytics**: Predictive metrics, health scoring, 30-day trends
+- **Merge Conflict Remediation**: AI-powered conflict analysis and resolution strategies
+- **File Operations**: Upload/download support for office files and archives
+
+### Upcoming Features
 - Plugin framework
-- Observability features
+- Trust fabric integration
+- Advanced observability features
+- Extended AI capabilities
+- Multi-repository dashboard
