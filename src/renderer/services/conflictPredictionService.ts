@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { PullRequest, ConflictPrediction, RemediationSuggestion } from '../types';
-import { ollamaService } from './ollamaService';
 
 class ConflictPredictionService {
   private baseUrl: string = 'http://localhost:11434';

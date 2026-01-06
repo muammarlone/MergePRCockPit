@@ -9,8 +9,7 @@ interface RemediationDashboardProps {
 }
 
 export const RemediationDashboard: React.FC<RemediationDashboardProps> = ({ 
-  pullRequests, 
-  repository 
+  pullRequests
 }) => {
   const [predictions, setPredictions] = useState<ConflictPrediction[]>([]);
   const [selectedPR, setSelectedPR] = useState<number | null>(null);

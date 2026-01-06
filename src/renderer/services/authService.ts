@@ -48,7 +48,7 @@ class AuthService {
   async loginWithGoogle(): Promise<User> {
     // In a real implementation, this would open OAuth flow
     // For now, we'll simulate it
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       // This would trigger OAuth window
       const mockUser: User = {
         id: 'google-' + Date.now(),

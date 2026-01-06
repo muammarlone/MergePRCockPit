@@ -10,7 +10,7 @@ import { FileOperations } from './FileOperations';
 import '../styles/Dashboard.css';
 
 export const Dashboard: React.FC = () => {
-  const [user, setUser] = useState(authService.getCurrentUser());
+  const [user] = useState(authService.getCurrentUser());
   const [selectedOwner, setSelectedOwner] = useState('');
   const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
   const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);

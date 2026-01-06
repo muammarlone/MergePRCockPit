@@ -55,7 +55,7 @@ ipcMain.handle('get-auth-token', async () => {
   return null;
 });
 
-ipcMain.handle('set-auth-token', async (_, token: string) => {
+ipcMain.handle('set-auth-token', async () => {
   // Token storage will be implemented with auth service
   return true;
 });

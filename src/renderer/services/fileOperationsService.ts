@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { FileOperation, FileOperationResult } from '../types';
 import { Octokit } from '@octokit/rest';
 import { authService } from './authService';

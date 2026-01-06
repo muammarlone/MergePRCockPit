@@ -16,19 +16,44 @@ A consumer-grade on-premises GitOps cockpit for managing pull requests across mu
 - Real-time PR list view with filtering
 - Detailed PR drill-down views
 
-### 📈 Analytics Dashboard
-- Repository activity metrics
+### 📈 Enhanced Analytics Dashboard
+- Repository activity metrics with trend analysis
 - PR statistics and health indicators
-- Merge conflict trends
+- **NEW:** PR velocity tracking (PRs per week)
+- **NEW:** Top contributors analytics with merge patterns
+- **NEW:** Merge conflict trend visualization over time
+- **NEW:** File hotspot analysis (most changed files)
 - Visual charts and graphs (using Recharts)
+- Predictive insights and actionable recommendations
 
 ### 🤖 AI-Powered Insights (Ollama Integration)
-- PR summaries
-- Risk assessment
+- PR summaries and risk assessment
 - Reviewer recommendations
 - Potential issue detection
-- Remediation suggestions
+- **NEW:** Conflict probability prediction
+- **NEW:** Merge conflict remediation suggestions
+- **NEW:** Auto-fix recommendations for common conflicts
+- **NEW:** Intelligent conflict area detection
 - Export context to external GPTs
+
+### 🔧 Merge Remediation Dashboard
+- **NEW:** Predictive conflict detection with probability scores
+- **NEW:** Risk level assessment (low/medium/high)
+- **NEW:** Automated remediation suggestions
+- **NEW:** Three-tier fix workflow: Suggest, Fix, Auto-Resolve
+- **NEW:** Confidence scoring for remediation actions
+- **NEW:** Historical conflict pattern analysis
+- **NEW:** Common conflict file identification
+
+### 📁 Advanced File Operations
+- **NEW:** Upload/download support for zip archives
+- **NEW:** Office document handling (docx, pptx, xlsx)
+- **NEW:** File versioning and history tracking
+- **NEW:** Checksum validation for integrity
+- **NEW:** Magic number verification for security
+- **NEW:** 100MB file size limit enforcement
+- **NEW:** Seamless GitHub integration with commit messages
+- **NEW:** File type validation and sanitization
 
 ### 🛠️ Core GitOps Operations
 - View open/closed/merged PRs
@@ -109,10 +134,12 @@ A consumer-grade on-premises GitOps cockpit for managing pull requests across mu
    - View the list of pull requests
    - Click on any PR to see details
    - Use the Analytics tab to see repository metrics
+   - **NEW:** Use the Remediation tab to see conflict predictions and fixes
+   - **NEW:** Use the Files tab to upload/download office documents and archives
 
 ### AI Features (Ollama)
 
-To enable AI-powered analysis:
+To enable AI-powered analysis and conflict prediction:
 
 1. **Install Ollama**
    - Download from https://ollama.ai
@@ -120,10 +147,33 @@ To enable AI-powered analysis:
    - Ensure Ollama is running on http://localhost:11434
 
 2. **Use AI Analysis**
-   - Open any PR detail view
-   - AI analysis will automatically run
+   - Open any PR detail view for AI-powered insights
    - View risk assessment, suggestions, and insights
+   - **NEW:** Navigate to Remediation tab for conflict predictions
+   - **NEW:** Get automated fix suggestions for merge conflicts
+   - **NEW:** Review auto-fixable conflicts with confidence scores
    - Export context to external GPT tools
+
+### File Operations
+
+Upload and manage files directly from the cockpit:
+
+1. **Navigate to Files Tab**
+   - Select a repository from the dashboard
+   - Click on the "📁 Files" tab
+
+2. **Upload Files**
+   - Select a file (zip, docx, pptx, xlsx)
+   - Specify the file path in the repository
+   - Choose the target branch
+   - Add a commit message
+   - Click "Upload File"
+
+3. **Security Features**
+   - File type validation using magic numbers
+   - Checksum verification for integrity
+   - 100MB maximum file size
+   - Version tracking for all uploads
 
 ## Architecture
 
@@ -240,9 +290,22 @@ For issues, questions, or contributions:
 
 ## Roadmap
 
-See [Issue #1](https://github.com/muammarlone/MergePRCockPit/issues/1) for the complete product roadmap including:
-- Advanced file operations (zip, docx, pptx)
-- Extended AI capabilities
-- Trust fabric integration
-- Plugin framework
-- Observability features
+See [Issue #1](https://github.com/muammarlone/MergePRCockPit/issues/1) for the complete product roadmap.
+
+### Recently Implemented (v1.1.0)
+- ✅ Enhanced analytics with trend analysis
+- ✅ PR velocity and contributor metrics
+- ✅ Conflict trend visualization
+- ✅ AI-powered conflict prediction
+- ✅ Merge remediation dashboard
+- ✅ Advanced file operations (zip, docx, pptx, xlsx)
+- ✅ File versioning and integrity checks
+- ✅ Auto-fix suggestions for conflicts
+
+### Upcoming Features
+- Extended AI capabilities with multiple models
+- Trust fabric integration for compliance
+- Plugin framework for extensibility
+- Observability features and metrics
+- Real-time collaboration features
+- Enhanced security scanning
