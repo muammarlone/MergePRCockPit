@@ -72,3 +72,64 @@ export interface OllamaAnalysis {
   potentialIssues: string[];
   suggestions: string[];
 }
+
+// Enhanced Analytics Types
+export interface TrendData {
+  date: string;
+  openPRs: number;
+  mergedPRs: number;
+  conflictPRs: number;
+}
+
+export interface PredictiveMetrics {
+  conflictProbability: number;
+  estimatedMergeTime: number;
+  riskFactors: string[];
+  recommendations: string[];
+}
+
+export interface EnhancedMetrics extends RepositoryMetrics {
+  trends: TrendData[];
+  conflictTrend: 'increasing' | 'decreasing' | 'stable';
+  velocityTrend: 'improving' | 'declining' | 'stable';
+  healthScore: number;
+}
+
+// Merge Remediation Types
+export interface ConflictAnalysis {
+  hasConflicts: boolean;
+  conflictFiles: string[];
+  severity: 'low' | 'medium' | 'high';
+  autoResolvable: boolean;
+  suggestedActions: string[];
+  aiRemediation?: string;
+}
+
+export interface RemediationSuggestion {
+  type: 'rebase' | 'merge' | 'manual' | 'auto';
+  description: string;
+  steps: string[];
+  confidence: number;
+  estimatedTime: number;
+}
+
+// File Operations Types
+export interface FileOperation {
+  type: 'upload' | 'download';
+  fileName: string;
+  filePath: string;
+  fileType: 'zip' | 'docx' | 'pptx' | 'xlsx' | 'pdf' | 'other';
+  size: number;
+  timestamp: Date;
+  status: 'pending' | 'success' | 'failed';
+  error?: string;
+}
+
+export interface FileMetadata {
+  name: string;
+  path: string;
+  sha: string;
+  size: number;
+  type: string;
+  downloadUrl: string;
+}
