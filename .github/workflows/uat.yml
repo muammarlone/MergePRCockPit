@@ -1,0 +1,52 @@
+name: UAT Testing
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  uat:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run UAT tests
+        run: npm run uat:full
+        continue-on-error: true
+      
+      - name: Upload UAT evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: uat-evidence
+          path: tests/uat/evidence/
+          retention-days: 30
+      
+      - name: Upload UAT reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: uat-reports
+          path: tests/uat/reports/
+          retention-days: 30
+      
+      - name: Display test summary
+        if: always()
+        run: |
+          if [ -f tests/uat/reports/latest-summary.md ]; then
+            cat tests/uat/reports/latest-summary.md
+          else
+            echo "No summary report found"
+          fi
