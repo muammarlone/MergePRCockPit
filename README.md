@@ -370,6 +370,82 @@ Watch mode for development:
 npm run test:watch
 ```
 
+## 🔧 Troubleshooting
+
+### Common Issues and Solutions
+
+#### OAuth / Authentication Issues
+
+**Problem**: "Mock" badge appears on login buttons  
+**Solution**: This is normal if OAuth is not configured. For development/testing, mock authentication works fine. To enable real OAuth:
+1. Copy `.env.example` to `.env`
+2. Add your Google/GitHub OAuth credentials
+3. See [DEPLOYMENT.md](DEPLOYMENT.md#oauth-setup-required-for-authentication) for detailed setup
+
+**Problem**: Can't sign in / Authentication fails  
+**Solution**:
+- Check browser console for error messages
+- If using real OAuth, verify your `.env` file has correct credentials
+- Try using mock authentication (works without configuration)
+- Clear browser local storage and try again
+
+#### Repository / GitHub Issues
+
+**Problem**: Can't load repositories  
+**Solution**:
+- Verify the GitHub username/organization name is correct
+- Check your internet connection
+- GitHub may rate-limit requests (60/hour without auth, 5000/hour with auth token)
+- Wait an hour or configure GitHub OAuth for higher limits
+
+**Problem**: "Recent Repositories" not showing  
+**Solution**:
+- Recent repositories are saved in browser local storage
+- Select a repository first, then it will appear in recent list next time
+- If you cleared browser data, recent repositories will be empty
+
+#### Build / Installation Issues
+
+**Problem**: Build fails with module not found errors  
+**Solution**:
+```bash
+# Clean install dependencies
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**Problem**: Electron app won't start  
+**Solution**:
+- Make sure you ran `npm install` first
+- Check Node.js version is 20.x or higher: `node --version`
+- Try rebuilding: `npm run build`
+- Check console for error messages
+
+#### Data / Storage Issues
+
+**Problem**: Lost my selected repository after restart  
+**Solution**:
+- This shouldn't happen - the app saves your last repository automatically
+- Check if browser local storage is being cleared
+- Try selecting a repository again - it will be saved
+
+**Problem**: Want to clear saved data / start fresh  
+**Solution**:
+- Sign out of the application (this clears workspace)
+- Or manually clear browser local storage
+- Or delete: `localStorage.getItem('mergePR_workspace')`
+
+### Getting Help
+
+If you encounter issues not listed here:
+1. Check the [Issues page](https://github.com/muammarlone/MergePRCockPit/issues) for similar problems
+2. Review [DEPLOYMENT.md](DEPLOYMENT.md) for detailed setup instructions
+3. Open a new issue with:
+   - Description of the problem
+   - Steps to reproduce
+   - Error messages or screenshots
+   - Your OS and Node.js version
+
 ## 🤝 Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
