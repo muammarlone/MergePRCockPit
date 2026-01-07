@@ -217,7 +217,11 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture documentation.
    npm install
    ```
 
-3. **Configure OAuth (Required for Production)**
+3. **Configure OAuth (Optional but Recommended for Production)**
+   
+   **For Development/Testing**: You can skip this step. The app will use mock authentication automatically.
+   
+   **For Production Use**: Follow these steps to enable real OAuth:
    
    ```bash
    # Copy the example environment file
@@ -228,9 +232,13 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture documentation.
    - **Google OAuth**: Get credentials from [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
    - **GitHub OAuth**: Get credentials from [GitHub Developer Settings](https://github.com/settings/developers)
    
-   See [DEPLOYMENT.md](DEPLOYMENT.md#oauth-setup-required-for-authentication) for detailed setup instructions.
+   **Detailed OAuth Setup Instructions**: See [DEPLOYMENT.md](DEPLOYMENT.md#oauth-setup-required-for-authentication) for step-by-step guides with screenshots.
    
-   **Note**: For development/testing, OAuth will fall back to mock authentication if not configured.
+   **Benefits of Real OAuth**:
+   - Secure authentication without storing passwords
+   - Access to private repositories (when GitHub token is used)
+   - Higher API rate limits for GitHub requests
+   - Professional-grade security for production deployments
 
 4. **Start the application in development mode**
    ```bash
@@ -270,16 +278,24 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture documentation.
 
 2. **Sign In**
    - Choose your preferred authentication method:
-     - Google OAuth (configured via .env)
-     - GitHub OAuth (configured via .env)
-     - Email/Password (mock for development)
+     - **Google OAuth** (requires .env configuration - see step 3 above)
+     - **GitHub OAuth** (requires .env configuration - see step 3 above)
+     - **Email/Password** (mock authentication for development/testing)
    
+   **Note**: If OAuth is not configured, the application will use mock authentication automatically. You'll see a "Mock" badge on the login buttons to indicate this.
+
 3. **Select Repository**
-   - Enter a GitHub username or organization name
+   - On first use, enter a GitHub username or organization name
    - Click "Load Repositories"
    - Select a repository from the dropdown
+   - **Your selection is automatically saved!** Next time you open the app, it will remember your last repository.
 
-4. **Manage Pull Requests**
+4. **Quick Access to Recent Repositories**
+   - After using the app, you'll see a "Recent Repositories" list when you next sign in
+   - Click any recent repository to quickly switch to it
+   - Up to 10 recent repositories are saved for easy access
+
+5. **Manage Pull Requests**
    - View the list of pull requests
    - Click on any PR to see details
    - Use the Analytics tab to see repository metrics
