@@ -14,15 +14,20 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const [oauthConfigured, setOauthConfigured] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Check if OAuth is configured
+    // Check if OAuth is properly configured
+    // Since we can't access .env from renderer process, we check after first login attempt
+    // For initial display, we show a conservative message
     const checkOAuthConfig = () => {
-      if (window.electronAPI) {
-        // In production, OAuth configuration is checked in the main process
-        // For now, we'll assume it's configured if electronAPI is available
-        setOauthConfigured(true);
-      } else {
+      // In development (browser), OAuth is definitely not available
+      if (!window.electronAPI) {
         setOauthConfigured(false);
+        return;
       }
+      
+      // In Electron app, OAuth *may* be configured
+      // We can't know for sure without trying, so we default to null (unknown)
+      // The main process will handle fallback to mock if credentials are missing
+      setOauthConfigured(null);
     };
     checkOAuthConfig();
   }, []);

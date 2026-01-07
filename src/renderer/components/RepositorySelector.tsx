@@ -21,7 +21,14 @@ export const RepositorySelector: React.FC<RepositorySelectorProps> = ({
   const [repositories, setRepositories] = useState<Repository[]>([]);
   const [loading, setLoading] = useState(false);
   const [showRecent, setShowRecent] = useState(true);
-  const recentRepos = workspaceService.getRecentRepositories();
+  
+  // Memoize recent repos to avoid unnecessary localStorage reads
+  const [recentRepos, setRecentRepos] = useState(workspaceService.getRecentRepositories());
+  
+  // Update recent repos when a new repo is selected
+  useEffect(() => {
+    setRecentRepos(workspaceService.getRecentRepositories());
+  }, [selectedRepo]);
 
   const handleLoadRepos = async () => {
     if (!owner.trim()) return;

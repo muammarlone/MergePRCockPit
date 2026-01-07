@@ -1,7 +1,6 @@
 import { Repository } from '../types';
 
 const WORKSPACE_STORAGE_KEY = 'mergePR_workspace';
-const RECENT_REPOS_KEY = 'mergePR_recent_repos';
 const MAX_RECENT_REPOS = 10;
 
 export interface WorkspaceSettings {
@@ -45,7 +44,7 @@ class WorkspaceService {
     this.settings.lastOwner = owner;
     this.settings.lastRepository = repo;
     this.addToRecentRepositories(owner, repo);
-    this.saveSettings();
+    // saveSettings is called by addToRecentRepositories, no need to call again
   }
 
   getLastOwner(): string | undefined {
