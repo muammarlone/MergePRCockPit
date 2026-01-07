@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { authService } from '../services/authService';
 import '../styles/Login.css';
 
@@ -11,6 +11,21 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [oauthConfigured, setOauthConfigured] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    // Check if OAuth is configured
+    const checkOAuthConfig = () => {
+      if (window.electronAPI) {
+        // In production, OAuth configuration is checked in the main process
+        // For now, we'll assume it's configured if electronAPI is available
+        setOauthConfigured(true);
+      } else {
+        setOauthConfigured(false);
+      }
+    };
+    checkOAuthConfig();
+  }, []);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -58,6 +73,13 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         <h1>MergePR Cockpit</h1>
         <p className="subtitle">GitOps Management Platform</p>
         
+        {oauthConfigured === false && (
+          <div className="info-message">
+            <p><strong>Note:</strong> OAuth is not configured. Using mock authentication for development.</p>
+            <p className="setup-hint">To enable real OAuth, see the <a href="https://github.com/muammarlone/MergePRCockPit#oauth-setup" target="_blank" rel="noopener noreferrer">setup guide</a>.</p>
+          </div>
+        )}
+
         {error && <div className="error-message">{error}</div>}
         
         <div className="oauth-buttons">
@@ -65,18 +87,22 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             className="oauth-button google"
             onClick={handleGoogleLogin}
             disabled={loading}
+            title={oauthConfigured === false ? "Mock Google authentication (OAuth not configured)" : "Sign in with Google"}
           >
             <span className="oauth-icon">G</span>
             Sign in with Google
+            {oauthConfigured === false && <span className="mock-badge">Mock</span>}
           </button>
           
           <button 
             className="oauth-button github"
             onClick={handleGitHubLogin}
             disabled={loading}
+            title={oauthConfigured === false ? "Mock GitHub authentication (OAuth not configured)" : "Sign in with GitHub"}
           >
             <span className="oauth-icon">⚡</span>
             Sign in with GitHub
+            {oauthConfigured === false && <span className="mock-badge">Mock</span>}
           </button>
         </div>
         
@@ -104,6 +130,9 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           <button type="submit" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign in with Email'}
           </button>
+          {oauthConfigured === false && (
+            <p className="mock-note">Mock authentication - for development only</p>
+          )}
         </form>
       </div>
     </div>

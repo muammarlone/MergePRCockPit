@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Repository, PullRequest, RepositoryMetrics } from '../types';
 import { githubService } from '../services/githubService';
 import { authService } from '../services/authService';
+import { workspaceService } from '../services/workspaceService';
 import { RepositorySelector } from './RepositorySelector';
 import { PullRequestList } from './PullRequestList';
 import { Analytics } from './Analytics';
@@ -9,8 +10,8 @@ import '../styles/Dashboard.css';
 
 export const Dashboard: React.FC = () => {
   const [user, setUser] = useState(authService.getCurrentUser());
-  const [selectedOwner, setSelectedOwner] = useState('');
-  const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
+  const [selectedOwner, setSelectedOwner] = useState(workspaceService.getLastOwner() || '');
+  const [selectedRepo, setSelectedRepo] = useState<Repository | null>(workspaceService.getLastRepository() || null);
   const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
   const [metrics, setMetrics] = useState<RepositoryMetrics | null>(null);
   const [loading, setLoading] = useState(false);
@@ -56,7 +57,15 @@ export const Dashboard: React.FC = () => {
 
   const handleLogout = async () => {
     await authService.logout();
+    workspaceService.clearWorkspace();
     window.location.reload();
+  };
+
+  const handleRepoChange = (repo: Repository | null) => {
+    setSelectedRepo(repo);
+    if (repo && selectedOwner) {
+      workspaceService.setLastRepository(selectedOwner, repo);
+    }
   };
 
   return (
@@ -74,7 +83,7 @@ export const Dashboard: React.FC = () => {
           selectedOwner={selectedOwner}
           selectedRepo={selectedRepo}
           onOwnerChange={setSelectedOwner}
-          onRepoChange={setSelectedRepo}
+          onRepoChange={handleRepoChange}
         />
 
         {selectedRepo && (

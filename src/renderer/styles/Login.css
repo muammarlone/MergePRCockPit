@@ -36,6 +36,33 @@
   text-align: center;
 }
 
+.info-message {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.info-message p {
+  margin: 0 0 8px 0;
+}
+
+.info-message p:last-child {
+  margin-bottom: 0;
+}
+
+.setup-hint {
+  font-size: 12px;
+}
+
+.setup-hint a {
+  color: #1565c0;
+  text-decoration: underline;
+}
+
 .oauth-buttons {
   display: flex;
   flex-direction: column;
@@ -53,6 +80,7 @@
   border: 2px solid #ddd;
   color: #333;
   font-weight: 500;
+  position: relative;
 }
 
 .oauth-button.google {
@@ -71,6 +99,17 @@
 
 .oauth-icon {
   font-size: 20px;
+  font-weight: bold;
+}
+
+.mock-badge {
+  position: absolute;
+  right: 10px;
+  background: #ff9800;
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
   font-weight: bold;
 }
 
@@ -111,4 +150,12 @@
 
 .email-form button:hover:not(:disabled) {
   background: #1976d2;
+}
+
+.mock-note {
+  font-size: 11px;
+  color: #ff9800;
+  text-align: center;
+  margin: -10px 0 0 0;
+  font-style: italic;
 }
