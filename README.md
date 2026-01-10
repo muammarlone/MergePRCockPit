@@ -217,7 +217,11 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture documentation.
    npm install
    ```
 
-3. **Configure OAuth (Required for Production)**
+3. **Configure OAuth (Optional but Recommended for Production)**
+   
+   **For Development/Testing**: You can skip this step. The app will use mock authentication automatically.
+   
+   **For Production Use**: Follow these steps to enable real OAuth:
    
    ```bash
    # Copy the example environment file
@@ -228,9 +232,13 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture documentation.
    - **Google OAuth**: Get credentials from [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
    - **GitHub OAuth**: Get credentials from [GitHub Developer Settings](https://github.com/settings/developers)
    
-   See [DEPLOYMENT.md](DEPLOYMENT.md#oauth-setup-required-for-authentication) for detailed setup instructions.
+   **Detailed OAuth Setup Instructions**: See [DEPLOYMENT.md](DEPLOYMENT.md#oauth-setup-required-for-authentication) for step-by-step guides with screenshots.
    
-   **Note**: For development/testing, OAuth will fall back to mock authentication if not configured.
+   **Benefits of Real OAuth**:
+   - Secure authentication without storing passwords
+   - Access to private repositories (when GitHub token is used)
+   - Higher API rate limits for GitHub requests
+   - Professional-grade security for production deployments
 
 4. **Start the application in development mode**
    ```bash
@@ -270,16 +278,24 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture documentation.
 
 2. **Sign In**
    - Choose your preferred authentication method:
-     - Google OAuth (configured via .env)
-     - GitHub OAuth (configured via .env)
-     - Email/Password (mock for development)
+     - **Google OAuth** (requires .env configuration - see step 3 above)
+     - **GitHub OAuth** (requires .env configuration - see step 3 above)
+     - **Email/Password** (mock authentication for development/testing)
    
+   **Note**: If OAuth is not configured, the application will use mock authentication automatically. You'll see a "Mock" badge on the login buttons to indicate this.
+
 3. **Select Repository**
-   - Enter a GitHub username or organization name
+   - On first use, enter a GitHub username or organization name
    - Click "Load Repositories"
    - Select a repository from the dropdown
+   - **Your selection is automatically saved!** Next time you open the app, it will remember your last repository.
 
-4. **Manage Pull Requests**
+4. **Quick Access to Recent Repositories**
+   - After using the app, you'll see a "Recent Repositories" list when you next sign in
+   - Click any recent repository to quickly switch to it
+   - Up to 10 recent repositories are saved for easy access
+
+5. **Manage Pull Requests**
    - View the list of pull requests
    - Click on any PR to see details
    - Use the Analytics tab to see repository metrics
@@ -353,6 +369,82 @@ Watch mode for development:
 ```bash
 npm run test:watch
 ```
+
+## 🔧 Troubleshooting
+
+### Common Issues and Solutions
+
+#### OAuth / Authentication Issues
+
+**Problem**: "Mock" badge appears on login buttons  
+**Solution**: This is normal if OAuth is not configured. For development/testing, mock authentication works fine. To enable real OAuth:
+1. Copy `.env.example` to `.env`
+2. Add your Google/GitHub OAuth credentials
+3. See [DEPLOYMENT.md](DEPLOYMENT.md#oauth-setup-required-for-authentication) for detailed setup
+
+**Problem**: Can't sign in / Authentication fails  
+**Solution**:
+- Check browser console for error messages
+- If using real OAuth, verify your `.env` file has correct credentials
+- Try using mock authentication (works without configuration)
+- Clear browser local storage and try again
+
+#### Repository / GitHub Issues
+
+**Problem**: Can't load repositories  
+**Solution**:
+- Verify the GitHub username/organization name is correct
+- Check your internet connection
+- GitHub may rate-limit requests (60/hour without auth, 5000/hour with auth token)
+- Wait an hour or configure GitHub OAuth for higher limits
+
+**Problem**: "Recent Repositories" not showing  
+**Solution**:
+- Recent repositories are saved in browser local storage
+- Select a repository first, then it will appear in recent list next time
+- If you cleared browser data, recent repositories will be empty
+
+#### Build / Installation Issues
+
+**Problem**: Build fails with module not found errors  
+**Solution**:
+```bash
+# Clean install dependencies
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**Problem**: Electron app won't start  
+**Solution**:
+- Make sure you ran `npm install` first
+- Check Node.js version is 20.x or higher: `node --version`
+- Try rebuilding: `npm run build`
+- Check console for error messages
+
+#### Data / Storage Issues
+
+**Problem**: Lost my selected repository after restart  
+**Solution**:
+- This shouldn't happen - the app saves your last repository automatically
+- Check if browser local storage is being cleared
+- Try selecting a repository again - it will be saved
+
+**Problem**: Want to clear saved data / start fresh  
+**Solution**:
+- Sign out of the application (this clears workspace)
+- Or manually clear browser local storage
+- Or delete: `localStorage.getItem('mergePR_workspace')`
+
+### Getting Help
+
+If you encounter issues not listed here:
+1. Check the [Issues page](https://github.com/muammarlone/MergePRCockPit/issues) for similar problems
+2. Review [DEPLOYMENT.md](DEPLOYMENT.md) for detailed setup instructions
+3. Open a new issue with:
+   - Description of the problem
+   - Steps to reproduce
+   - Error messages or screenshots
+   - Your OS and Node.js version
 
 ## 🤝 Contributing
 
