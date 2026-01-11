@@ -19,15 +19,13 @@ module.exports = {
     fallback: {
       "buffer": require.resolve("buffer/"),
       "process": require.resolve("process/browser"),
-      "stream": require.resolve("stream-browserify"),
       "util": require.resolve("util/"),
-      "crypto": require.resolve("crypto-browserify"),
+      "stream": require.resolve("stream-browserify"),
       "path": require.resolve("path-browserify"),
+      "crypto": require.resolve("crypto-browserify"),
       "fs": false,
-      "http": require.resolve("stream-http"),
-      "https": require.resolve("https-browserify"),
-      "os": require.resolve("os-browserify/browser"),
-      "url": require.resolve("url/")
+      "net": false,
+      "tls": false
     }
   },
   module: {
@@ -57,7 +55,7 @@ module.exports = {
       process: 'process/browser',
     }),
     new webpack.DefinePlugin({
-      'global': 'globalThis',
+      'global': 'window',
     })
   ],
   devServer: {
