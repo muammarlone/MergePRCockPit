@@ -17,13 +17,17 @@ module.exports = {
       '@': path.resolve(__dirname, 'src')
     },
     fallback: {
-      "path": require.resolve("path-browserify"),
-      "os": require.resolve("os-browserify/browser"),
-      "crypto": require.resolve("crypto-browserify"),
-      "stream": require.resolve("stream-browserify"),
       "buffer": require.resolve("buffer/"),
       "process": require.resolve("process/browser"),
-      "vm": require.resolve("vm-browserify")
+      "stream": require.resolve("stream-browserify"),
+      "util": require.resolve("util/"),
+      "crypto": require.resolve("crypto-browserify"),
+      "path": require.resolve("path-browserify"),
+      "fs": false,
+      "http": require.resolve("stream-http"),
+      "https": require.resolve("https-browserify"),
+      "os": require.resolve("os-browserify/browser"),
+      "url": require.resolve("url/")
     }
   },
   module: {
@@ -49,12 +53,11 @@ module.exports = {
       filename: 'index.html'
     }),
     new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
       process: 'process/browser',
-      Buffer: ['buffer', 'Buffer']
     }),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
-      global: 'window'
+      'global': 'globalThis',
     })
   ],
   devServer: {
