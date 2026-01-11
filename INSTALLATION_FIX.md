@@ -114,6 +114,43 @@ rm -rf dist/ build/ .cache/
 npm run build
 ```
 
+### 8. Webpack Polyfill Errors
+
+**Problem:** Build fails with "Cannot find module 'buffer'" or similar errors for process, util, stream-browserify, path-browserify, or crypto-browserify.
+
+**Solution:**
+These polyfill packages should already be in `package.json` devDependencies. If they're missing or you encounter errors:
+```bash
+# Install polyfill dependencies
+npm install --save-dev buffer process util stream-browserify path-browserify crypto-browserify
+
+# Rebuild
+npm run build
+```
+
+**Note:** The webpack configuration in `webpack.renderer.config.js` already includes the necessary ProvidePlugin and fallback configurations for these polyfills.
+
+### 9. Electron Security CSP Warning
+
+**Problem:** Electron shows "Insecure Content-Security-Policy" warning with "unsafe-eval" enabled.
+
+**Solution:**
+The Content Security Policy in `src/renderer/index.html` has been configured to remove `unsafe-eval` and `unsafe-inline` from script-src while maintaining security. The current CSP configuration:
+
+```html
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.github.com https://github.com https://accounts.google.com https://oauth2.googleapis.com http://localhost:11434; font-src 'self' data:;">
+```
+
+**What this allows:**
+- Scripts: Only from same origin (no inline or eval)
+- Styles: Same origin plus inline styles (needed for React)
+- Images: Same origin, data URIs, and HTTPS sources
+- Network: GitHub API, Google OAuth, and local Ollama server
+- Fonts: Same origin and data URIs
+
+**Verification:**
+After building and running the app, check the Electron DevTools console. You should see no CSP warnings.
+
 ## Platform-Specific Issues
 
 ### Windows
