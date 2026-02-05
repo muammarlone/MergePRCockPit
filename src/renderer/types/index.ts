@@ -88,6 +88,33 @@ export interface UserInfo {
   picture?: string;
 }
 
+// GADOS V2 Types
+export type AdvisorySeverity = 'informational' | 'recommendation' | 'caution' | 'blocking';
+export type MethodologyFramework = 'startup' | 'scrum' | 'kanban' | 'safe' | 'cmmi' | 'itil';
+export type RACIRole = 'Accountable' | 'Responsible' | 'Consulted' | 'Informed';
+
+export interface AdvisoryAssistant {
+  assistant_id: string;
+  name: string;
+  description: string;
+  methodology: MethodologyFramework;
+  authority: 'advisory' | 'recommending' | 'enforcing' | 'blocking';
+  active: boolean;
+  target_roles: RACIRole[];
+}
+
+export interface AdvisoryMessage {
+  id: string;
+  assistant_id: string;
+  severity: AdvisorySeverity;
+  context: string;
+  message_template: string;
+  explanation: string;
+  suggested_action: string;
+  status: 'active' | 'dismissed' | 'acknowledged' | 'accepted' | 'overridden';
+  triggered_at: string;
+}
+
 declare global {
   interface Window {
     electronAPI?: {

@@ -3,13 +3,13 @@ import { OllamaAnalysis, PullRequest } from '../types';
 
 class OllamaService {
   private baseUrl: string = 'http://localhost:11434';
-  private model: string = 'llama2';
+  private model: string = 'qwen2.5:7b';
 
   async analyzePullRequest(pr: PullRequest): Promise<OllamaAnalysis> {
     try {
       const prompt = this.buildPRAnalysisPrompt(pr);
       const response = await this.generateCompletion(prompt);
-      
+
       return this.parseAnalysis(response);
     } catch (error) {
       console.error('Failed to analyze PR with Ollama:', error);
@@ -46,7 +46,7 @@ Format your response as JSON with keys: summary, riskAssessment, suggestedReview
       }, {
         timeout: 30000
       });
-      
+
       return response.data.response;
     } catch (error) {
       console.error('Ollama API error:', error);
@@ -71,7 +71,7 @@ Format your response as JSON with keys: summary, riskAssessment, suggestedReview
     } catch (error) {
       console.error('Failed to parse Ollama response:', error);
     }
-    
+
     return {
       summary: response,
       riskAssessment: 'medium',
