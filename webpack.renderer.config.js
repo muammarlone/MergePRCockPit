@@ -2,6 +2,10 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 
+// Determine if Ollama should be allowed in CSP (development only)
+const isDevelopment = process.env.NODE_ENV !== 'production';
+const ollamaUrl = isDevelopment ? ' http://localhost:11434' : '';
+
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   entry: './src/renderer/index.tsx',
@@ -48,7 +52,8 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/renderer/index.html',
-      filename: 'index.html'
+      filename: 'index.html',
+      ollamaUrl: ollamaUrl
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
