@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PullRequest, Repository, OllamaAnalysis } from '../types';
 import { ollamaService } from '../services/ollamaService';
 import { githubService } from '../services/githubService';
@@ -19,7 +19,7 @@ export const PullRequestDetail: React.FC<PullRequestDetailProps> = ({
   const [analyzing, setAnalyzing] = useState(false);
   const [merging, setMerging] = useState(false);
 
-  const loadAnalysis = async () => {
+  const loadAnalysis = useCallback(async () => {
     setAnalyzing(true);
     try {
       const result = await ollamaService.analyzePullRequest(pullRequest);
@@ -29,12 +29,11 @@ export const PullRequestDetail: React.FC<PullRequestDetailProps> = ({
     } finally {
       setAnalyzing(false);
     }
-  };
+  }, [pullRequest]);
 
   useEffect(() => {
     loadAnalysis();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pullRequest]);
+  }, [loadAnalysis]);
 
   const handleMerge = async () => {
     if (!confirm('Are you sure you want to merge this pull request?')) return;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Repository, PullRequest, RepositoryMetrics } from '../types';
 import { githubService } from '../services/githubService';
 import { authService } from '../services/authService';
@@ -17,7 +17,7 @@ export const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'prs' | 'analytics'>('prs');
 
-  const loadPullRequests = async () => {
+  const loadPullRequests = useCallback(async () => {
     if (!selectedRepo) return;
     
     setLoading(true);
@@ -32,9 +32,9 @@ export const Dashboard: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedRepo]);
 
-  const loadMetrics = async () => {
+  const loadMetrics = useCallback(async () => {
     if (!selectedRepo) return;
     
     try {
@@ -46,15 +46,14 @@ export const Dashboard: React.FC = () => {
     } catch (error) {
       console.error('Failed to load metrics:', error);
     }
-  };
+  }, [selectedRepo]);
 
   useEffect(() => {
     if (selectedRepo) {
       loadPullRequests();
       loadMetrics();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRepo]);
+  }, [selectedRepo, loadPullRequests, loadMetrics]);
 
   const handleLogout = async () => {
     await authService.logout();
