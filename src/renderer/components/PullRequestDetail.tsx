@@ -19,10 +19,6 @@ export const PullRequestDetail: React.FC<PullRequestDetailProps> = ({
   const [analyzing, setAnalyzing] = useState(false);
   const [merging, setMerging] = useState(false);
 
-  useEffect(() => {
-    loadAnalysis();
-  }, [pullRequest]);
-
   const loadAnalysis = async () => {
     setAnalyzing(true);
     try {
@@ -34,6 +30,11 @@ export const PullRequestDetail: React.FC<PullRequestDetailProps> = ({
       setAnalyzing(false);
     }
   };
+
+  useEffect(() => {
+    loadAnalysis();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pullRequest]);
 
   const handleMerge = async () => {
     if (!confirm('Are you sure you want to merge this pull request?')) return;

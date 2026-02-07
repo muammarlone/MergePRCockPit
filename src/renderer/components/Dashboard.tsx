@@ -9,20 +9,13 @@ import { Analytics } from './Analytics';
 import '../styles/Dashboard.css';
 
 export const Dashboard: React.FC = () => {
-  const [user, setUser] = useState(authService.getCurrentUser());
+  const [user] = useState(authService.getCurrentUser());
   const [selectedOwner, setSelectedOwner] = useState(workspaceService.getLastOwner() || '');
   const [selectedRepo, setSelectedRepo] = useState<Repository | null>(workspaceService.getLastRepository() || null);
   const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
   const [metrics, setMetrics] = useState<RepositoryMetrics | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'prs' | 'analytics'>('prs');
-
-  useEffect(() => {
-    if (selectedRepo) {
-      loadPullRequests();
-      loadMetrics();
-    }
-  }, [selectedRepo]);
 
   const loadPullRequests = async () => {
     if (!selectedRepo) return;
@@ -54,6 +47,14 @@ export const Dashboard: React.FC = () => {
       console.error('Failed to load metrics:', error);
     }
   };
+
+  useEffect(() => {
+    if (selectedRepo) {
+      loadPullRequests();
+      loadMetrics();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRepo]);
 
   const handleLogout = async () => {
     await authService.logout();
