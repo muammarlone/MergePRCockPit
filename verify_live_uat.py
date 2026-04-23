@@ -4,7 +4,7 @@ import sys
 
 def verify_uat():
     print(">>> CONNECTING TO LIVE DEMO SERVER...")
-    base_url = "http://localhost:5000"
+    base_url = "http://127.0.0.1:8000"
     
     # 1. Verify Root
     try:

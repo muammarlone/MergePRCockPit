@@ -133,18 +133,25 @@ class GitHubService {
       console.log(`[GADOS-AUDIT] Intercepting merge for PR #${pullNumber}`);
 
       const pr = await this.getPullRequest(owner, repo, pullNumber);
+      if (!pr) return false;
+
       const auditResult = await this.triggerGADOSAudit(pr);
 
-      if (auditResult.status === 'CAUTION_REQUIRED') {
-        console.warn(`[GADOS-AUDIT] Caution required for merge: ${auditResult.audit_id}`);
-        // In enforcement mode, we would block here if not overridden
+      if (auditResult.status === 'DENIED') {
+        console.error(`[GADOS-AUDIT] MERGE BLOCKED: ${auditResult.reason}`);
+        alert(`SOVEREIGN VETO IN EFFECT: ${auditResult.reason}`);
+        return false;
+      }
+
+      if (auditResult.status === 'CAUTION') {
+        console.warn(`[GADOS-AUDIT] Caution required: ${auditResult.reason}`);
       }
 
       await this.octokit!.pulls.merge({
         owner,
         repo,
         pull_number: pullNumber,
-        commit_message: commitMessage
+        commit_message: commitMessage || `Verified Merge (Audit ID: ${auditResult.audit_id || 'AUTO'})`
       });
 
       console.log(`[GADOS-AUDIT] PR #${pullNumber} merged & transaction recorded in Graph Audit.`);
@@ -160,13 +167,27 @@ class GitHubService {
    */
   private async triggerGADOSAudit(pr: any): Promise<any> {
     console.log('[GADOS-AUDIT] Triggering Forward Engineer Audit Gate...');
-    const riskLevel = pr.additions > 100 ? 'high' : 'low';
-    return {
-      status: riskLevel === 'high' ? 'CAUTION_REQUIRED' : 'READY',
-      pr_id: pr.number,
-      audit_id: `AUDIT-${Math.random().toString(36).substr(2, 9)}`,
-      risk_level: riskLevel
-    };
+    try {
+      const response = await fetch('http://localhost:8000/api/audit/verify-merge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pr)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { status: 'DENIED', reason: errorData.detail || 'Internal Audit Failure' };
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.warn('[GADOS-AUDIT] Backend unreachable. Falling back to optimistic local audit.');
+      const riskLevel = pr.additions > 100 ? 'high' : 'low';
+      return {
+        status: riskLevel === 'high' ? 'CAUTION' : 'APPROVED',
+        reason: 'Local Optimistic Verification (Connectivity Loss)'
+      };
+    }
   }
 
   async getRepositoryMetrics(owner: string, repo: string): Promise<RepositoryMetrics> {

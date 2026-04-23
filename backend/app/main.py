@@ -47,8 +47,6 @@ async def get_advisory_messages(project_id: str = "MergePRCockPit"):
     Returns active advisory messages for the project.
     Simulated response for UAT verification.
     """
-    # In a real system, we'd query the DB
-    # For UAT, we return the latest advised mutations from the engine
     return [
         {
             "id": "MSG-001",
@@ -60,6 +58,46 @@ async def get_advisory_messages(project_id: str = "MergePRCockPit"):
             "triggered_at": "2026-02-05T01:10:00Z"
         }
     ]
+
+class SovereignScanner:
+    """
+    Simulates the GADOS V2 Sovereign Invariant Scanner.
+    Audits PR content for structural and security integrity.
+    """
+    def scan_pr(self, pr_data: Dict[str, Any]) -> Dict[str, Any]:
+        # Check for 'GHOST_COMPONENT' invariant
+        body = pr_data.get('body', '').upper()
+        additions = pr_data.get('additions', 0)
+        
+        if "NO_AUDIT" in body:
+            return {"status": "DENIED", "reason": "Sovereign Invariant Breach: Unauthorized Audit Bypass attempt."}
+        
+        if additions > 500:
+            return {"status": "CAUTION", "reason": "Structural Depth: PR size requires Multi-Sig ratification."}
+            
+        return {"status": "APPROVED", "reason": "Compliant with Sovereign Logic Baseline."}
+
+scanner = SovereignScanner()
+
+@app.post("/api/audit/verify-merge")
+async def verify_merge(pr_data: Dict[str, Any]):
+    """
+    The GADOS V2 Audit Gate for PR Merges.
+    """
+    result = scanner.scan_pr(pr_data)
+    
+    # Log the verification attempt in the Bitemporal Graph
+    audit_logger.log_mutation(
+        source="AGENT-WARDEN-V2",
+        target=f"PR-{pr_data.get('number', 'UNK')}",
+        predicate="VERIFIED" if result['status'] == "APPROVED" else "BLOCKED",
+        properties={"status": result['status'], "reason": result['reason']}
+    )
+    
+    if result['status'] == "DENIED":
+        raise HTTPException(status_code=403, detail=result['reason'])
+        
+    return result
 
 @app.post("/api/audit/mutation")
 async def record_mutation(mutation: Dict[str, Any]):
