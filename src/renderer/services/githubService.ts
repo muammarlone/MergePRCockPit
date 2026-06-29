@@ -2,6 +2,10 @@ import { Octokit } from '@octokit/rest';
 import { Repository, PullRequest, RepositoryMetrics } from '../types';
 import { authService } from './authService';
 
+// Type for Octokit API responses
+type OctokitPullRequest = Awaited<ReturnType<Octokit['pulls']['list']>>['data'][number];
+type OctokitPullRequestDetailed = Awaited<ReturnType<Octokit['pulls']['get']>>['data'];
+
 class GitHubService {
   private octokit: Octokit | null = null;
 
@@ -58,7 +62,7 @@ class GitHubService {
 
       // Map API response to our PullRequest type
       // Note: list endpoint doesn't include all details, those require individual PR fetch
-      return response.data.map((pr: any) => ({
+      return response.data.map((pr: OctokitPullRequest) => ({
         id: pr.id,
         number: pr.number,
         title: pr.title,
@@ -71,7 +75,7 @@ class GitHubService {
         base: pr.base,
         body: pr.body || '',
         html_url: pr.html_url,
-        mergeable: pr.mergeable,
+        mergeable: undefined, // Not available in list endpoint
         comments: 0, // Not available in list endpoint
         commits: 0, // Not available in list endpoint
         additions: 0, // Not available in list endpoint
@@ -96,7 +100,7 @@ class GitHubService {
         pull_number: pullNumber
       });
 
-      const pr = response.data as any; // Use any to access all fields
+      const pr = response.data as OctokitPullRequestDetailed;
       return {
         id: pr.id,
         number: pr.number,
@@ -133,8 +137,11 @@ class GitHubService {
       console.log(`[GADOS-AUDIT] Intercepting merge for PR #${pullNumber}`);
 
       const pr = await this.getPullRequest(owner, repo, pullNumber);
-      if (!pr) return false;
-
+      if (!pr) {
+        console.error('[GADOS-AUDIT] PR not found');
+        return false;
+      }
+      
       const auditResult = await this.triggerGADOSAudit(pr);
 
       if (auditResult.status === 'DENIED') {
@@ -165,7 +172,12 @@ class GitHubService {
   /**
    * Triggers the GADOS Forward Engineer Audit Gate.
    */
-  private async triggerGADOSAudit(pr: any): Promise<any> {
+  private async triggerGADOSAudit(pr: PullRequest): Promise<{
+    status: string;
+    pr_id: number;
+    audit_id: string;
+    risk_level: string;
+  }> {
     console.log('[GADOS-AUDIT] Triggering Forward Engineer Audit Gate...');
     try {
       const response = await fetch('http://localhost:8000/api/audit/verify-merge', {

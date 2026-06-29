@@ -118,7 +118,7 @@ export interface AdvisoryMessage {
 declare global {
   interface Window {
     electronAPI?: {
-      getAuthToken: () => Promise<any>;
+      getAuthToken: () => Promise<AuthToken | null>;
       setAuthToken: (token: string) => Promise<boolean>;
       clearAuthToken: () => Promise<boolean>;
       oauthGoogle: () => Promise<OAuthTokenResponse>;

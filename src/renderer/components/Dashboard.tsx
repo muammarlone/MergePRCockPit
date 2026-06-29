@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Repository, PullRequest, RepositoryMetrics } from '../types';
 import { githubService } from '../services/githubService';
 import { authService } from '../services/authService';
@@ -9,7 +9,7 @@ import { Analytics } from './Analytics';
 import '../styles/Dashboard.css';
 
 export const Dashboard: React.FC = () => {
-  const [user, setUser] = useState(authService.getCurrentUser());
+  const [user] = useState(authService.getCurrentUser());
   const [selectedOwner, setSelectedOwner] = useState(workspaceService.getLastOwner() || '');
   const [selectedRepo, setSelectedRepo] = useState<Repository | null>(workspaceService.getLastRepository() || null);
   const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
@@ -17,14 +17,7 @@ export const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'prs' | 'analytics'>('prs');
 
-  useEffect(() => {
-    if (selectedRepo) {
-      loadPullRequests();
-      loadMetrics();
-    }
-  }, [selectedRepo]);
-
-  const loadPullRequests = async () => {
+  const loadPullRequests = useCallback(async () => {
     if (!selectedRepo) return;
     
     setLoading(true);
@@ -39,9 +32,9 @@ export const Dashboard: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedRepo]);
 
-  const loadMetrics = async () => {
+  const loadMetrics = useCallback(async () => {
     if (!selectedRepo) return;
     
     try {
@@ -53,7 +46,14 @@ export const Dashboard: React.FC = () => {
     } catch (error) {
       console.error('Failed to load metrics:', error);
     }
-  };
+  }, [selectedRepo]);
+
+  useEffect(() => {
+    if (selectedRepo) {
+      loadPullRequests();
+      loadMetrics();
+    }
+  }, [selectedRepo, loadPullRequests, loadMetrics]);
 
   const handleLogout = async () => {
     await authService.logout();
